@@ -4515,7 +4515,9 @@ function closeBrief() {
 // ── 탭1: 실적 브리핑 ──────────────────────────────────────────────────────
 function _briefPerformance(h, prev, mood) {
   const revDelta   = prev ? ((h.rev - prev.rev) / Math.max(prev.rev, 1) * 100).toFixed(1) : null;
-  const shareDelta = prev ? ((h.share - prev.share) * 100).toFixed(2) : null;
+  const myRel      = (h.relShare ?? h.share) * 100;
+  const prevRel    = prev ? ((prev.relShare ?? prev.share) * 100) : null;
+  const shareDelta = prevRel !== null ? (myRel - prevRel).toFixed(2) : null;
   const margin     = h.rev > 0 ? Math.round(h.profit / h.rev * 100) : 0;
 
   const kpiCards = [
@@ -4524,7 +4526,7 @@ function _briefPerformance(h, prev, mood) {
       pos: revDelta >= 0 },
     { label:'순이익 (마진)', val: `${fmt(h.profit)} (${margin}%)`,
       delta: margin >= 0 ? '흑자' : '적자', pos: margin >= 0 },
-    { label:'시장점유율',  val: (h.share * 100).toFixed(2) + '%',
+    { label:'시장점유율',  val: myRel.toFixed(1) + '%',
       delta: shareDelta !== null ? (shareDelta >= 0 ? `▲ ${shareDelta}%p` : `▼ ${Math.abs(shareDelta)}%p`) : null,
       pos: shareDelta >= 0 },
     { label:'현금 잔고',   val: fmt(h.cash), delta: null, pos: true },
@@ -4553,8 +4555,8 @@ function _briefPerformance(h, prev, mood) {
   else
     commentLines.push(`⚠️ 대표님, 상황이 위급합니다. 즉각적인 비용 절감과 자금 조달이 필요합니다.`);
 
-  if (prev && h.share < prev.share)
-    commentLines.push(`시장점유율이 <strong>${(Math.abs(h.share - prev.share)*100).toFixed(2)}%p</strong> 하락했습니다. 경쟁사 탭을 확인해 주세요.`);
+  if (prev && (h.relShare ?? h.share) < (prev.relShare ?? prev.share))
+    commentLines.push(`시장점유율이 <strong>${(Math.abs((h.relShare??h.share) - (prev.relShare??prev.share))*100).toFixed(1)}%p</strong> 하락했습니다. 경쟁사 탭을 확인해 주세요.`);
   if (h.quality >= 80)
     commentLines.push(`제품 품질 점수 <strong>${Math.round(h.quality)}/100</strong> — 고객 만족도가 높게 유지되고 있습니다.`);
 
@@ -5502,12 +5504,18 @@ function continueGame() {
   const saved = loadAutoSave();
   if (!saved) return;
   Object.assign(G, saved);
+  G.firedEvents = new Set(saved.firedEvents || []);
   if (saved._decisionState) Object.assign(decisionState, saved._decisionState);
   pendingEvent = null;
   showScreen('sc-game');
-  updateSliderMaxes();
   initCharts();
   renderAll();
+  const ds = decisionState;
+  document.getElementById('sl-rd').value    = Math.round((ds.rd    || 50000) / 1000);
+  document.getElementById('sl-mkt').value   = Math.round((ds.mkt   || 20000) / 1000);
+  document.getElementById('sl-hr').value    = Math.round((ds.hr    || 0)     / 1000);
+  document.getElementById('sl-price').value = Math.round((ds.price || 1.0)   * 100);
+  syncSlider('rd'); syncSlider('mkt'); syncSlider('hr'); syncPrice();
 }
 
 function refreshContinueButton() {
