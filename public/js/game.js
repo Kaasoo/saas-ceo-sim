@@ -5571,6 +5571,7 @@ function _closeMenuOutside(e) {
 function confirmMainMenu() {
   document.getElementById('game-menu-dropdown').classList.remove('open');
   if (confirm('메인 메뉴로 돌아가시겠습니까?\n(저장하지 않은 진행상황은 사라집니다)')) {
+    autoSave(); // 메인 메뉴 이동 전 현재 상태 자동저장
     resetGame();
   }
 }
