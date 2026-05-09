@@ -4508,6 +4508,7 @@ function _updateBriefFooter() {
 
 function closeBrief() {
   document.getElementById('brief-modal').classList.remove('open');
+  autoSave();
   renderAll();
 }
 
@@ -5479,6 +5480,51 @@ function saveToSlot(slot) {
 
 function saveGame() { openSaveModal(); }
 
+// ── 자동 저장 (슬롯 0 = 자동저장 전용) ─────────────────────────────────────
+const AUTO_SAVE_KEY = 'ceosim_autosave';
+
+function autoSave() {
+  if (!G || !G.year) return;
+  try {
+    const data = { ...G, firedEvents: [...G.firedEvents], _decisionState: decisionState };
+    localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadAutoSave() {
+  try {
+    const raw = localStorage.getItem(AUTO_SAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function continueGame() {
+  const saved = loadAutoSave();
+  if (!saved) return;
+  Object.assign(G, saved);
+  if (saved._decisionState) Object.assign(decisionState, saved._decisionState);
+  pendingEvent = null;
+  showScreen('sc-game');
+  updateSliderMaxes();
+  initCharts();
+  renderAll();
+}
+
+function refreshContinueButton() {
+  const btn = document.getElementById('btn-continue');
+  const sub = document.getElementById('btn-continue-sub');
+  if (!btn) return;
+  const saved = loadAutoSave();
+  if (saved && saved.year) {
+    const h = saved.history && saved.history[saved.history.length - 1];
+    const cash = h ? fmt(h.cash) : '—';
+    sub.textContent = `${saved.name || '—'} · Q${saved.quarter} ${saved.year} · 현금 ${cash}`;
+    btn.style.display = '';
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
 function loadGame(slot) {
   const saved = Storage.load(slot);
   if (!saved) {
@@ -5524,6 +5570,7 @@ function confirmMainMenu() {
 function resetGame() {
   showScreen('sc-intro');
   refreshSaveSlots('save-slots', 'load');
+  refreshContinueButton();
 }
 
 // Radio group clicks
@@ -5560,4 +5607,5 @@ window.addEventListener('DOMContentLoaded', () => {
   syncSlider('hr');
   syncPrice();
   refreshSaveSlots('save-slots', 'load');
+  refreshContinueButton();
 });
