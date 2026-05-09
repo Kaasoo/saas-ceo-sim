@@ -1,0 +1,11 @@
+{
+  "appId": "com.ceosim.game",
+  "appName": "CEO 시뮬레이터",
+  "webDir": "public",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0a0e1a"
+  }
+}

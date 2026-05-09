@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CEO 시뮬레이터 — 소프트웨어 제국 1980–2050</title>
+<link rel="stylesheet" href="/style.css">
+<script src="/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════ INTRO ══════════════════ -->
+<div id="sc-intro" class="screen active">
+  <div class="intro-wrap">
+    <div class="intro-eyebrow">SOFTWARE EMPIRE</div>
+    <h1 class="intro-title">CEO<br><span>시뮬레이터</span></h1>
+    <p class="intro-lead">1980년 차고 창업부터 2050년 글로벌 소프트웨어 제국까지.<br>역사적 산업 변화를 헤쳐나가며 경쟁사를 압도하세요.</p>
+
+    <div class="intro-form card">
+      <div class="form-row">
+        <label>회사명</label>
+        <input id="in-name" type="text" placeholder="ACME Software" maxlength="24">
+      </div>
+      <div class="form-row">
+        <label>대표 제품명</label>
+        <input id="in-product" type="text" placeholder="Business Suite Pro" maxlength="30">
+      </div>
+      <!-- 시작 연도는 항상 1980 초창기 고정 -->
+      <input type="hidden" id="in-year" data-v="1980">
+      <div class="form-row">
+        <label>난이도</label>
+        <div class="radio-group" id="in-diff">
+          <label class="radio-opt" data-v="easy" title="초기현금 2배 · 경쟁사 약화 · 위기피해 50% · 대출이자 할인">쉬움</label>
+          <label class="radio-opt selected" data-v="normal" title="기본 설정">보통</label>
+          <label class="radio-opt" data-v="hard" title="초기현금 절반 · 경쟁사 강화 · 위기피해 1.8배 · 고금리">어려움</label>
+        </div>
+        <div id="diff-desc" style="display:none"></div>
+      </div>
+      <button class="btn-primary" onclick="startGame()">창업 시작 →</button>
+    </div>
+
+    <!-- SAVE SLOTS -->
+    <div class="save-slots-wrap">
+      <div class="save-slots-title">💾 저장된 게임 불러오기</div>
+      <div class="save-slots" id="save-slots">
+        <div class="save-slot empty" onclick="loadGame(1)"><span class="ss-num">1</span><span class="ss-empty">빈 슬롯</span></div>
+        <div class="save-slot empty" onclick="loadGame(2)"><span class="ss-num">2</span><span class="ss-empty">빈 슬롯</span></div>
+        <div class="save-slot empty" onclick="loadGame(3)"><span class="ss-num">3</span><span class="ss-empty">빈 슬롯</span></div>
+      </div>
+    </div>
+
+    <div class="intro-feat">
+      <div class="feat-item"><span class="feat-icon">📈</span>경쟁사 AI 성장 시뮬레이션</div>
+      <div class="feat-item"><span class="feat-icon">⚡</span>역사적 산업 변화 이벤트</div>
+      <div class="feat-item"><span class="feat-icon">♟</span>포터 전략·BCG 이론 접목</div>
+      <div class="feat-item"><span class="feat-icon">💰</span>임금·비용 시대별 인플레이션</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ GAME ══════════════════ -->
+<div id="sc-game" class="screen">
+
+  <!-- HEADER -->
+  <header class="game-header">
+    <div class="hd-left">
+      <div class="hd-company" id="hd-company">—</div>
+      <div class="hd-era" id="hd-era">—</div>
+    </div>
+    <div class="hd-kpis">
+      <div class="hd-kpi"><div class="hd-kpi-l">현금</div><div class="hd-kpi-v" id="hd-cash">—</div></div>
+      <div class="hd-kpi"><div class="hd-kpi-l">분기 매출</div><div class="hd-kpi-v" id="hd-rev">—</div></div>
+      <div class="hd-kpi"><div class="hd-kpi-l">시장점유율</div><div class="hd-kpi-v" id="hd-share">—</div></div>
+      <div class="hd-kpi"><div class="hd-kpi-l">직원 수</div><div class="hd-kpi-v" id="hd-emp">—</div></div>
+      <div class="hd-kpi"><div class="hd-kpi-l">지분율</div><div class="hd-kpi-v" id="hd-equity">100%</div></div>
+      <div class="hd-kpi" id="hd-loan-kpi" style="display:none"><div class="hd-kpi-l">대출 잔액</div><div class="hd-kpi-v" id="hd-loan" style="color:var(--red)">—</div></div>
+    </div>
+    <div class="hd-right">
+      <div class="hd-time" id="hd-time">Q1 1980</div>
+      <div class="save-btn-group">
+        <button class="btn-save" onclick="openSaveModal()">저장</button>
+        <button class="btn-menu" onclick="toggleGameMenu()" title="메뉴">☰</button>
+      </div>
+      <div class="game-menu-dropdown" id="game-menu-dropdown">
+        <div class="gmd-item" onclick="openSaveModal();toggleGameMenu()">💾 저장하기</div>
+        <div class="gmd-item" onclick="confirmMainMenu()">🏠 메인 메뉴로</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ERA BANNER -->
+  <div class="era-banner" id="era-banner">
+    <span id="era-icon">💾</span>
+    <span id="era-name">PC 소프트웨어 시대</span>
+    <span id="era-year">1980–1994</span>
+  </div>
+
+  <!-- 모바일 전용: KPI 요약 + 패널 전환 탭 -->
+  <div class="mobile-bar" id="mobile-bar">
+    <div class="mb-kpis">
+      <div class="mb-kpi"><span class="mb-kpi-l">현금</span><span class="mb-kpi-v" id="mb-cash">—</span></div>
+      <div class="mb-kpi"><span class="mb-kpi-l">매출</span><span class="mb-kpi-v" id="mb-rev">—</span></div>
+      <div class="mb-kpi"><span class="mb-kpi-l">점유율</span><span class="mb-kpi-v" id="mb-share">—</span></div>
+      <div class="mb-kpi"><span class="mb-kpi-l">직원</span><span class="mb-kpi-v" id="mb-emp">—</span></div>
+      <div class="mb-kpi" id="mb-loan-kpi" style="display:none"><span class="mb-kpi-l">대출</span><span class="mb-kpi-v" id="mb-loan" style="color:var(--red)">—</span></div>
+    </div>
+    <div class="mb-tabs">
+      <button class="mb-tab active" id="mb-tab-decision" onclick="switchMobilePanel('decision')">📋 의사결정</button>
+      <button class="mb-tab" id="mb-tab-dashboard" onclick="switchMobilePanel('dashboard')">📊 대시보드</button>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="game-layout">
+
+    <!-- LEFT: DECISIONS -->
+    <aside class="panel-left">
+      <div class="panel-title">분기 의사결정</div>
+
+      <!-- STRATEGY -->
+      <div class="section">
+        <div class="section-label">경쟁 전략 <span class="theory-tip" title="Porter의 본원적 전략">?</span></div>
+        <div class="strat-row" id="strat-row">
+          <div class="strat-btn selected" data-s="differentiation" onclick="selectStrat(this)">
+            <div class="strat-name">💎 차별화</div>
+            <div class="strat-desc">R&D → 품질↑</div>
+          </div>
+          <div class="strat-btn" data-s="cost_leadership" onclick="selectStrat(this)">
+            <div class="strat-name">💰 원가우위</div>
+            <div class="strat-desc">효율↑ 가격↓</div>
+          </div>
+          <div class="strat-btn" data-s="focus" onclick="selectStrat(this)">
+            <div class="strat-name">🎯 집중화</div>
+            <div class="strat-desc">기술 특화</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUDGETS -->
+      <div class="section">
+        <div class="section-label">예산 배분 <span class="theory-tip" title="자원기반관점(RBV): 핵심역량에 집중 투자">?</span></div>
+
+        <!-- R&D -->
+        <div class="slider-row">
+          <div class="sl-header">
+            <span>R&D / 제품개발</span>
+            <span class="sl-val" id="sl-rd-v">$0</span>
+          </div>
+          <!-- 데스크탑: 슬라이더 -->
+          <input type="range" id="sl-rd" min="0" max="500" step="10" value="50" oninput="syncSlider('rd')" class="desktop-slider">
+          <!-- 모바일: 스테퍼 버튼 -->
+          <div class="mob-stepper">
+            <button class="step-btn step-dn" onclick="stepBudget('rd',-5)">−큰</button>
+            <button class="step-btn step-dn" onclick="stepBudget('rd',-1)">−</button>
+            <button class="step-val" onclick="promptBudget('rd')">편집</button>
+            <button class="step-btn step-up" onclick="stepBudget('rd',+1)">+</button>
+            <button class="step-btn step-up" onclick="stepBudget('rd',+5)">+큰</button>
+          </div>
+          <div class="sl-hint">품질↑ 기술력↑ (NPS·시장점유율 향상)</div>
+        </div>
+
+        <!-- 마케팅 -->
+        <div class="slider-row">
+          <div class="sl-header">
+            <span>마케팅 / 영업</span>
+            <span class="sl-val" id="sl-mkt-v">$0</span>
+          </div>
+          <input type="range" id="sl-mkt" min="0" max="500" step="10" value="20" oninput="syncSlider('mkt')" class="desktop-slider">
+          <div class="mob-stepper">
+            <button class="step-btn step-dn" onclick="stepBudget('mkt',-5)">−큰</button>
+            <button class="step-btn step-dn" onclick="stepBudget('mkt',-1)">−</button>
+            <button class="step-val" onclick="promptBudget('mkt')">편집</button>
+            <button class="step-btn step-up" onclick="stepBudget('mkt',+1)">+</button>
+            <button class="step-btn step-up" onclick="stepBudget('mkt',+5)">+큰</button>
+          </div>
+          <div class="sl-hint">브랜드↑ 신규고객↑ (점유율 확대)</div>
+        </div>
+
+        <!-- HR -->
+        <div class="slider-row">
+          <div class="sl-header">
+            <span>HR / 인재개발</span>
+            <span class="sl-val" id="sl-hr-v">$0</span>
+          </div>
+          <input type="range" id="sl-hr" min="0" max="200" step="5" value="0" oninput="syncSlider('hr')" class="desktop-slider">
+          <div class="mob-stepper">
+            <button class="step-btn step-dn" onclick="stepBudget('hr',-5)">−큰</button>
+            <button class="step-btn step-dn" onclick="stepBudget('hr',-1)">−</button>
+            <button class="step-val" onclick="promptBudget('hr')">편집</button>
+            <button class="step-btn step-up" onclick="stepBudget('hr',+1)">+</button>
+            <button class="step-btn step-up" onclick="stepBudget('hr',+5)">+큰</button>
+          </div>
+          <div class="sl-hint" id="hr-hint" style="line-height:1.6">HR지수 0× (미투자) | 생산성 -20% | 이직률 +0.8%p | 채용력 -30% | 임금 +0%</div>
+        </div>
+      </div>
+
+      <!-- HIRING -->
+      <div class="section">
+        <div class="section-label">채용 / 조정 <span class="theory-tip" title="인적자원관리: 규모와 생산성 균형">?</span></div>
+        <!-- 표시용 채용 바 -->
+        <div class="hire-bar-wrap">
+          <div class="hire-bar-track">
+            <div class="hire-bar-fill" id="hire-bar-fill"></div>
+            <div class="hire-bar-pending" id="hire-bar-pending"></div>
+            <div class="hire-bar-min-marker" id="hire-bar-min-marker"></div>
+          </div>
+          <div class="hire-bar-labels">
+            <span id="hire-bar-cur">0명</span>
+            <span id="hire-bar-min-lbl" style="font-size:9px;color:var(--muted)">최소: <span id="hire-bar-min">—</span></span>
+            <span id="hire-bar-max-lbl">최대: <span id="hire-bar-max">—</span></span>
+          </div>
+        </div>
+        <div class="hire-row">
+          <button class="hire-btn" onclick="adjustHire(-5)">−5</button>
+          <button class="hire-btn" onclick="adjustHire(-1)">−1</button>
+          <div class="hire-val">
+            <input type="number" id="hire-count" value="0" class="hire-input" oninput="setHireInput(this.value)">명
+            <div class="hire-sub" id="hire-cost-txt">채용비 $0</div>
+          </div>
+          <button class="hire-btn" onclick="adjustHire(+1)">+1</button>
+          <button class="hire-btn" onclick="adjustHire(+5)">+5</button>
+        </div>
+        <div class="hire-row" id="hire-row-lg" style="display:none">
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(-50)">−50</button>
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(-10)">−10</button>
+          <div style="flex:1"></div>
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(+10)">+10</button>
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(+50)">+50</button>
+        </div>
+        <div class="hire-row" id="hire-row-xl" style="display:none">
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(-200)">−200</button>
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(-100)">−100</button>
+          <div style="flex:1"></div>
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(+100)">+100</button>
+          <button class="hire-btn hire-btn-lg" onclick="adjustHire(+200)">+200</button>
+        </div>
+        <div class="sl-hint">현재: <span id="cur-emp">3</span>명 · 최대 <span id="hire-max-disp">5</span>명 채용 · 필요 최소: <span id="min-emp-disp">1</span>명 · <span id="emp-cap-disp" style="color:var(--muted)">10,000명 한도</span></div>
+        <button id="btn-fill-min-emp" onclick="fillToMinEmp()"
+          style="display:none;width:100%;margin-top:6px;padding:7px 10px;border-radius:6px;
+                 border:1px solid var(--red);background:rgba(239,68,68,0.10);
+                 color:var(--red);font-size:12px;font-weight:600;cursor:pointer;text-align:center">
+          🚨 최소 인원 충원: <span id="fill-min-label">+0명</span>
+          <span style="font-size:10px;font-weight:400;color:var(--muted)" id="fill-min-sub"></span>
+        </button>
+      </div>
+
+      <!-- PRICE -->
+      <div class="section">
+        <div class="section-label">가격 포지셔닝 <span class="theory-tip" title="가격 전략: 시장 평균 대비">?</span></div>
+        <div class="price-row">
+          <span class="price-label">시장평균 대비</span>
+          <input type="range" id="sl-price" min="60" max="160" step="5" value="100"
+            oninput="syncPrice()" class="desktop-slider">
+          <span class="price-val" id="price-v">100%</span>
+        </div>
+        <!-- 모바일 스테퍼 -->
+        <div class="mob-stepper" style="margin-top:4px">
+          <button class="step-btn step-dn" onclick="stepPrice(-3)">−15%</button>
+          <button class="step-btn step-dn" onclick="stepPrice(-1)">−5%</button>
+          <button class="step-val" onclick="promptPrice()">직접입력</button>
+          <button class="step-btn step-up" onclick="stepPrice(+1)">+5%</button>
+          <button class="step-btn step-up" onclick="stepPrice(+3)">+15%</button>
+        </div>
+        <div class="sl-hint" id="price-hint">중간 가격: 품질 대비 균형 유지</div>
+      </div>
+
+      <!-- FUNDING -->
+      <div class="section">
+        <div class="section-label">자금 조달 <span class="theory-tip" title="스타트업 파이낸싱: 시드→시리즈A/B/C→IPO">?</span></div>
+        <div class="fund-status">
+          <div class="fund-stat-row">
+            <span>창업자 지분</span><strong id="fs-equity">100%</strong>
+          </div>
+          <div class="fund-stat-row" id="fs-loan-row" style="display:none">
+            <span>대출 상환</span><strong id="fs-loan-pay" style="color:var(--red)">$0/분기</strong>
+          </div>
+        </div>
+        <button class="btn-fund" onclick="openFundingModal()">💰 투자 유치 / 대출</button>
+        <button class="btn-launch" id="btn-launch" onclick="launchNewProduct()" style="display:none">🚀 신제품 출시</button>
+      </div>
+
+      <!-- COST PREVIEW -->
+      <div class="cost-preview" id="cost-preview">
+        <div class="cp-row"><span>인건비 <span id="cp-wage-badge" style="font-size:9px;color:#f59e0b"></span></span><span id="cp-sal">$0</span></div>
+        <div class="cp-row"><span>R&D</span><span id="cp-rd">$0</span></div>
+        <div class="cp-row"><span>마케팅</span><span id="cp-mkt">$0</span></div>
+        <div class="cp-row"><span>기타 운영</span><span id="cp-ops">$0</span></div>
+        <div class="cp-row" id="cp-cogs-row"><span>매출원가 <span style="font-size:9px;opacity:.7">(인프라·지원)</span></span><span id="cp-cogs" style="color:var(--red)">$0</span></div>
+        <div class="cp-row" id="cp-loan-row" style="display:none"><span>대출 상환</span><span id="cp-loan" style="color:var(--red)">$0</span></div>
+        <div class="cp-row cp-total"><span>총 비용</span><span id="cp-total">$0</span></div>
+        <div class="cp-row cp-profit"><span>예상 순이익</span><span id="cp-profit">$0</span></div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT: DASHBOARD -->
+    <main class="panel-right">
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('dashboard',this)">📊 대시보드</button>
+        <button class="tab" onclick="switchTab('market',this)">🏆 시장 현황</button>
+        <button class="tab" onclick="switchTab('history',this)">📈 성과 추이</button>
+        <button class="tab" onclick="switchTab('theory',this)">📚 경영 이론</button>
+      </div>
+
+      <!-- TAB: DASHBOARD -->
+      <div id="tab-dashboard" class="tab-panel active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">연간 환산 매출</div>
+            <div class="kpi-val" id="k-arr">$0</div>
+            <div class="kpi-delta" id="k-arr-d">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">분기 순이익</div>
+            <div class="kpi-val" id="k-profit">$0</div>
+            <div class="kpi-delta" id="k-profit-d">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">시장점유율</div>
+            <div class="kpi-val" id="k-share">0.00%</div>
+            <div class="kpi-delta" id="k-share-d">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">제품 품질</div>
+            <div class="kpi-val" id="k-quality">0</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-q-bar"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">브랜드 파워</div>
+            <div class="kpi-val" id="k-brand">0</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-b-bar"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">기술 수준</div>
+            <div class="kpi-val" id="k-tech">0</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-t-bar"></div></div>
+          </div>
+          <div class="kpi-card" style="grid-column:span 2">
+            <div class="kpi-label">직원 사기 · 이탈률</div>
+            <div class="kpi-val" id="k-morale" style="font-size:13px">—</div>
+            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-morale-bar"></div></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">분기 이탈</div>
+            <div class="kpi-val" id="k-attrition" style="font-size:14px">0명</div>
+            <div class="kpi-label" id="k-min-emp" style="margin-top:4px">—</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">매출 & 순이익 추이 (분기별)</div>
+          <canvas id="chart-rev" height="120"></canvas>
+        </div>
+
+        <!-- Tech Debt Status Panel — hidden when no active debts -->
+        <div id="tech-debt-panel" class="tech-debt-panel" style="display:none"></div>
+
+        <div class="news-panel">
+          <div class="news-title">최근 동향</div>
+          <div id="news-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB: MARKET -->
+      <div id="tab-market" class="tab-panel">
+        <div class="market-info card">
+          <div class="mi-row"><span>총 시장 규모</span><strong id="mkt-size">—</strong></div>
+          <div class="mi-row"><span>내 점유율</span><strong id="mkt-my-share">—</strong></div>
+          <div class="mi-row"><span>시장 성장률 (연)</span><strong id="mkt-growth">—</strong></div>
+          <div class="mi-row"><span>현재 시대</span><strong id="mkt-era">—</strong></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">시장 점유율 경쟁 (분기별)</div>
+          <canvas id="chart-share" height="130"></canvas>
+        </div>
+
+        <div class="chart-card" style="margin-top:12px;display:none">
+          <div class="chart-title">총 시장 규모 성장 (연간 TAM)</div>
+          <canvas id="chart-tam" height="110"></canvas>
+        </div>
+
+        <div class="comp-title">경쟁사 현황</div>
+        <div id="comp-table"></div>
+      </div>
+
+      <!-- TAB: HISTORY -->
+      <div id="tab-history" class="tab-panel">
+        <div class="chart-card">
+          <div class="chart-title">현금 잔고 추이</div>
+          <canvas id="chart-cash" height="120"></canvas>
+        </div>
+        <div class="chart-card" style="margin-top:12px">
+          <div class="chart-title">직원 수 & 품질 추이</div>
+          <canvas id="chart-org" height="100"></canvas>
+        </div>
+        <div class="hist-table-wrap">
+          <table id="hist-table">
+            <thead><tr><th>분기</th><th>매출</th><th>순이익</th><th>점유율</th><th>현금</th><th>직원</th></tr></thead>
+            <tbody id="hist-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: THEORY -->
+      <div id="tab-theory" class="tab-panel">
+        <div class="theory-section">
+          <div class="th-head">♟ Porter의 본원적 경쟁 전략</div>
+          <div class="th-body">
+            <b>차별화 전략</b>: 고품질·고가격으로 프리미엄 시장 공략. R&D 투자 효과 30% 증폭.<br>
+            <b>원가우위 전략</b>: 효율적 운영으로 저가 제공. 대규모 시장 점유 가능.<br>
+            <b>집중화 전략</b>: 특정 기술·틈새시장에 집중. 높은 진입 장벽 구축.
+          </div>
+          <div class="th-gauge" id="bcg-display"></div>
+        </div>
+        <div class="theory-section">
+          <div class="th-head">📊 BCG 매트릭스 — 현재 제품 포지션</div>
+          <div class="th-body">
+            <b>Star ⭐</b>: 고성장·고점유 → 집중 투자<br>
+            <b>Cash Cow 🐄</b>: 저성장·고점유 → 수익 창출<br>
+            <b>Question Mark ❓</b>: 고성장·저점유 → 전략적 투자 결정<br>
+            <b>Dog 🐕</b>: 저성장·저점유 → 철수 또는 최소 유지
+          </div>
+          <div class="th-gauge" id="bcg-matrix"></div>
+        </div>
+        <div class="theory-section">
+          <div class="th-head">🔄 제품 생명주기 (PLC)</div>
+          <div class="th-body">현재 제품의 시장 단계와 권장 투자 전략을 보여줍니다.</div>
+          <div id="plc-display"></div>
+        </div>
+        <div class="theory-section">
+          <div class="th-head">🌊 Blue Ocean 지수</div>
+          <div class="th-body">경쟁이 없는 새로운 시장 공간을 얼마나 개척했는지 측정합니다.<br>
+            R&D로 새 기능을 개발하고 기술 선도력을 높일수록 지수가 상승합니다.</div>
+          <div class="th-gauge">
+            <div class="kpi-bar-wrap" style="margin-top:8px"><div class="kpi-bar" id="blue-ocean-bar" style="background:#06b6d4"></div></div>
+            <div style="text-align:right;font-size:11px;color:var(--mist);margin-top:4px" id="blue-ocean-val">—</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- 다음 분기 버튼: 모바일에서 화면 최하단 고정 -->
+  <div class="next-quarter-bar">
+    <button class="btn-next" onclick="nextQuarter()">
+      다음 분기 실행 →
+      <div class="btn-next-sub" id="btn-qinfo">Q1 1980</div>
+    </button>
+  </div>
+
+</div>
+
+<!-- ══════════════════ SAVE MODAL ══════════════════ -->
+<div class="modal-bg" id="save-modal">
+  <div class="modal-box modal-save">
+    <div class="modal-era-tag">게임 저장</div>
+    <h2 class="modal-title" style="margin-bottom:12px">저장 슬롯 선택</h2>
+    <div class="save-modal-slots" id="save-modal-slots"></div>
+    <button class="btn-secondary" onclick="closeSaveModal()" style="margin-top:12px;width:100%">취소</button>
+  </div>
+</div>
+
+<!-- ══════════════════ FUNDING MODAL ══════════════════ -->
+<div class="modal-bg" id="fund-modal">
+  <div class="modal-box modal-fund">
+    <div class="modal-era-tag">자금 조달 옵션</div>
+    <h2 class="modal-title" style="margin-bottom:4px">투자 유치 / 대출</h2>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:6px">현재 지분율: <strong id="fm-equity">100%</strong> · 대출 잔액: <strong id="fm-loans">없음</strong></p>
+    <p id="fm-credit" style="font-size:11px;color:var(--muted);margin-bottom:16px">신용등급 계산 중…</p>
+    <div id="fund-options"></div>
+    <button class="btn-secondary" onclick="closeFundingModal()" style="margin-top:16px;width:100%">닫기</button>
+  </div>
+</div>
+
+<!-- ══════════════════ ACQUISITION MODAL ══════════════════ -->
+<div class="modal-bg" id="acq-modal">
+  <div class="modal-box modal-acq">
+    <div class="modal-era-tag">기업 인수</div>
+    <div class="acq-target-header">
+      <h2 class="modal-title" id="acq-target-name">—</h2>
+      <span id="acq-ipo-badge" class="comp-ipo-badge" style="display:none"></span>
+    </div>
+    <div id="acq-details"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn-primary" id="acq-confirm-btn" style="flex:2">🤝 인수 확정</button>
+      <button class="btn-secondary" onclick="closeAcquisitionModal()" style="flex:1">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ EVENT MODAL ══════════════════ -->
+<div class="modal-bg" id="ev-modal">
+  <div class="modal-box">
+    <div class="modal-era-tag" id="ev-era-tag">이벤트 발생</div>
+    <div class="modal-type-badge" id="ev-type-badge">기회</div>
+    <h2 class="modal-title" id="ev-title">—</h2>
+    <p class="modal-body" id="ev-body">—</p>
+    <div class="modal-choices" id="ev-choices"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ RESULTS MODAL ══════════════════ -->
+<div class="modal-bg" id="res-modal">
+  <div class="modal-box modal-results">
+    <div class="res-header">
+      <div class="res-q" id="res-q">Q1 1980 결과</div>
+      <div class="res-era" id="res-era">—</div>
+    </div>
+    <div class="res-grid" id="res-grid"></div>
+    <div id="res-margin-tag" class="res-margin-tag"></div>
+    <div class="res-news" id="res-news"></div>
+    <button class="btn-primary" onclick="closeResults()">비서 브리핑 받기 →</button>
+  </div>
+</div>
+
+<!-- ══════════════════ SECRETARY BRIEFING MODAL ══════════════════ -->
+<div class="modal-bg" id="brief-modal">
+  <div class="modal-box modal-brief">
+    <!-- 비서 헤더 -->
+    <div class="brief-header">
+      <div class="brief-avatar" id="brief-avatar">👩‍💼</div>
+      <div class="brief-meta">
+        <div class="brief-date" id="brief-date">Q1 1980 — 분기 브리핑</div>
+      </div>
+      <div class="brief-mood" id="brief-mood">📋</div>
+    </div>
+
+    <!-- 브리핑 탭 -->
+    <div class="brief-tabs">
+      <button class="brief-tab active" onclick="briefTab(0)">📊 실적</button>
+      <button class="brief-tab" onclick="briefTab(1)">⚔️ 경쟁</button>
+      <button class="brief-tab" onclick="briefTab(2)">💰 자금</button>
+      <button class="brief-tab" onclick="briefTab(3)">🧭 전략</button>
+    </div>
+
+    <!-- 탭 콘텐츠 -->
+    <div class="brief-body" id="brief-body"></div>
+
+    <!-- 하단 버튼 -->
+    <div class="brief-footer">
+      <button class="brief-next-tab btn-ghost" id="brief-next-btn" onclick="briefNextTab()">다음 ›</button>
+      <button class="btn-primary" id="brief-close-btn" onclick="closeBrief()" style="display:none">다음 분기 준비 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ GAME OVER ══════════════════ -->
+<div id="sc-gameover" class="screen">
+  <div class="go-wrap">
+    <div class="go-label" id="go-label">게임 오버</div>
+    <h1 class="go-title" id="go-title">회사 파산</h1>
+    <p class="go-sub" id="go-sub">—</p>
+    <div class="go-grid" id="go-grid"></div>
+    <div class="go-eval" id="go-eval"></div>
+    <button class="btn-primary" style="margin-top:32px" onclick="resetGame()">↺ 다시 시작</button>
+  </div>
+</div>
+
+<script src="/js/game.js"></script>
+</body>
+</html>

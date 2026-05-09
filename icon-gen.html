@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin:0; background:#000; display:flex; flex-direction:column; align-items:center; padding:20px; gap:12px; }
+  canvas { display:block; }
+  button { padding:10px 24px; font-size:14px; cursor:pointer; border-radius:6px; border:none; background:#3b82f6; color:#fff; font-weight:600; }
+</style>
+</head>
+<body>
+<canvas id="c512" width="512" height="512"></canvas>
+<canvas id="c1024" width="1024" height="500"></canvas>
+<button onclick="downloadAll()">⬇ PNG 저장 (아이콘 + 피처 그래픽)</button>
+
+<script>
+function drawIcon(canvas, W, H) {
+  const ctx = canvas.getContext('2d');
+
+  // ── 배경 그라디언트 ──
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0,   '#0a0e1a');
+  bg.addColorStop(0.5, '#0f1628');
+  bg.addColorStop(1,   '#0a1225');
+  ctx.fillStyle = bg;
+
+  // 둥근 모서리 배경
+  const r = W * 0.16;
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(W - r, 0);
+  ctx.quadraticCurveTo(W, 0, W, r);
+  ctx.lineTo(W, H - r);
+  ctx.quadraticCurveTo(W, H, W - r, H);
+  ctx.lineTo(r, H);
+  ctx.quadraticCurveTo(0, H, 0, H - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  const s = W / 512; // 스케일 팩터
+
+  // ── 그리드 라인 (미묘하게) ──
+  ctx.strokeStyle = 'rgba(59,130,246,0.06)';
+  ctx.lineWidth = 1;
+  for (let gx = 0; gx < W; gx += 40*s) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+  }
+  for (let gy = 0; gy < H; gy += 40*s) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+  }
+
+  // ── 도시 스카이라인 ──
+  const baseY = H * 0.80;
+  const bldgs = [
+    {x:0.02, w:0.10, h:0.30},
+    {x:0.13, w:0.08, h:0.38},
+    {x:0.22, w:0.11, h:0.32},
+    {x:0.34, w:0.06, h:0.48},
+    {x:0.41, w:0.12, h:0.36},
+    {x:0.54, w:0.09, h:0.52},
+    {x:0.64, w:0.08, h:0.42},
+    {x:0.73, w:0.10, h:0.34},
+    {x:0.84, w:0.07, h:0.28},
+    {x:0.92, w:0.08, h:0.22},
+  ];
+
+  bldgs.forEach(b => {
+    const bx = b.x * W, bw = b.w * W, bh = b.h * H, by = baseY - bh;
+
+    // 건물 몸체
+    const bgrad = ctx.createLinearGradient(bx, by, bx + bw, by);
+    bgrad.addColorStop(0, 'rgba(30,45,90,0.85)');
+    bgrad.addColorStop(1, 'rgba(20,30,65,0.85)');
+    ctx.fillStyle = bgrad;
+    ctx.fillRect(bx, by, bw, bh);
+
+    // 창문 불빛
+    const wStep = 14*s, wSize = 6*s;
+    for (let wy = by + 10*s; wy < baseY - 8*s; wy += wStep) {
+      for (let wx = bx + 6*s; wx < bx + bw - 4*s; wx += wStep) {
+        if (Math.random() > 0.35) {
+          const alpha = 0.5 + Math.random() * 0.5;
+          ctx.fillStyle = `rgba(255,220,100,${alpha})`;
+          ctx.fillRect(wx, wy, wSize, wSize * 1.2);
+        }
+      }
+    }
+  });
+
+  // 지평선 글로우
+  const horizGlow = ctx.createLinearGradient(0, baseY - 30*s, 0, baseY + 20*s);
+  horizGlow.addColorStop(0, 'rgba(59,130,246,0.15)');
+  horizGlow.addColorStop(1, 'rgba(59,130,246,0)');
+  ctx.fillStyle = horizGlow;
+  ctx.fillRect(0, baseY - 30*s, W, 50*s);
+
+  // 바닥
+  ctx.fillStyle = 'rgba(20,35,75,0.6)';
+  ctx.fillRect(0, baseY, W, H - baseY);
+
+  // ── 차트 라인 (상승 추세) ──
+  const chartPoints = [
+    [0.05, 0.70], [0.15, 0.60], [0.22, 0.55],
+    [0.32, 0.45], [0.42, 0.38], [0.52, 0.30],
+    [0.62, 0.22], [0.72, 0.16], [0.82, 0.10], [0.93, 0.05],
+  ].map(([px, py]) => [px * W, py * H]);
+
+  // 차트 영역 채우기
+  ctx.beginPath();
+  ctx.moveTo(chartPoints[0][0], baseY);
+  chartPoints.forEach(([x, y]) => ctx.lineTo(x, y));
+  ctx.lineTo(chartPoints[chartPoints.length-1][0], baseY);
+  ctx.closePath();
+  const areaGrad = ctx.createLinearGradient(0, 0, 0, baseY);
+  areaGrad.addColorStop(0, 'rgba(16,185,129,0.18)');
+  areaGrad.addColorStop(1, 'rgba(16,185,129,0.01)');
+  ctx.fillStyle = areaGrad;
+  ctx.fill();
+
+  // 글로우 레이어들
+  [
+    {lw: 14*s, color: 'rgba(16,185,129,0.08)'},
+    {lw: 8*s,  color: 'rgba(16,185,129,0.18)'},
+    {lw: 4*s,  color: 'rgba(52,211,153,0.40)'},
+    {lw: 2.5*s,color: 'rgba(167,243,208,0.90)'},
+  ].forEach(({lw, color}) => {
+    ctx.beginPath();
+    ctx.moveTo(chartPoints[0][0], chartPoints[0][1]);
+    chartPoints.forEach(([x, y]) => ctx.lineTo(x, y));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  });
+
+  // 데이터 포인트
+  chartPoints.forEach(([x, y], i) => {
+    if (i === chartPoints.length - 1) {
+      // 마지막 포인트 강조
+      ctx.beginPath();
+      ctx.arc(x, y, 10*s, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(52,211,153,0.25)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, 6*s, 0, Math.PI*2);
+      ctx.fillStyle = '#34d399';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, 3*s, 0, Math.PI*2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    } else if (i % 2 === 0) {
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5*s, 0, Math.PI*2);
+      ctx.fillStyle = '#a7f3d0';
+      ctx.fill();
+    }
+  });
+
+  // 상승 화살표 (오른쪽 상단)
+  const arrowX = 0.88 * W, arrowY = 0.08 * H;
+  ctx.save();
+  ctx.translate(arrowX, arrowY);
+  ctx.rotate(-Math.PI/4);
+  ctx.strokeStyle = 'rgba(52,211,153,0.6)';
+  ctx.lineWidth = 3*s;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-12*s, 8*s);
+  ctx.lineTo(0, -8*s);
+  ctx.lineTo(12*s, 8*s);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── "CEO" 텍스트 ──
+  const textY = H * 0.92;
+
+  // 텍스트 글로우
+  ctx.shadowColor = 'rgba(59,130,246,0.8)';
+  ctx.shadowBlur = 20*s;
+  ctx.fillStyle = '#fff';
+  ctx.font = `900 ${115*s}px 'Arial Black', Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = `${8*s}px`;
+  ctx.fillText('CEO', W/2, textY);
+  ctx.shadowBlur = 0;
+
+  // "CEO" 그라디언트 오버레이
+  const tGrad = ctx.createLinearGradient(W/2 - 100*s, textY - 90*s, W/2 + 100*s, textY);
+  tGrad.addColorStop(0, '#93c5fd');
+  tGrad.addColorStop(0.5, '#ffffff');
+  tGrad.addColorStop(1, '#60a5fa');
+  ctx.fillStyle = tGrad;
+  ctx.fillText('CEO', W/2, textY);
+
+  // "SIMULATOR" 서브타이틀
+  ctx.fillStyle = 'rgba(148,163,184,0.85)';
+  ctx.font = `600 ${18*s}px Arial, sans-serif`;
+  ctx.letterSpacing = `${5*s}px`;
+  ctx.fillText('1980 · 2050', W/2, textY + 22*s);
+
+  // ── 테두리 글로우 ──
+  ctx.shadowBlur = 0;
+  const borderGrad = ctx.createLinearGradient(0, 0, W, H);
+  borderGrad.addColorStop(0, 'rgba(59,130,246,0.4)');
+  borderGrad.addColorStop(0.5, 'rgba(16,185,129,0.2)');
+  borderGrad.addColorStop(1, 'rgba(59,130,246,0.4)');
+  ctx.strokeStyle = borderGrad;
+  ctx.lineWidth = 2*s;
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(W-r, 0);
+  ctx.quadraticCurveTo(W, 0, W, r);
+  ctx.lineTo(W, H-r);
+  ctx.quadraticCurveTo(W, H, W-r, H);
+  ctx.lineTo(r, H);
+  ctx.quadraticCurveTo(0, H, 0, H-r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.stroke();
+}
+
+function drawFeatureGraphic(canvas) {
+  const W = 1024, H = 500;
+  const ctx = canvas.getContext('2d');
+
+  // 배경
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#0a0e1a');
+  bg.addColorStop(1, '#0f1a30');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // 그리드
+  ctx.strokeStyle = 'rgba(59,130,246,0.05)';
+  ctx.lineWidth = 1;
+  for (let gx = 0; gx < W; gx += 50) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+  for (let gy = 0; gy < H; gy += 50) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+
+  // 왼쪽에 아이콘 (작게)
+  const iconCanvas = document.createElement('canvas');
+  iconCanvas.width = 200; iconCanvas.height = 200;
+  drawIcon(iconCanvas, 200, 200);
+  ctx.drawImage(iconCanvas, 60, 150, 200, 200);
+
+  // 오른쪽 텍스트
+  ctx.textAlign = 'left';
+
+  // 메인 타이틀
+  ctx.shadowColor = 'rgba(59,130,246,0.6)';
+  ctx.shadowBlur = 15;
+  const tg = ctx.createLinearGradient(300, 150, 700, 280);
+  tg.addColorStop(0, '#93c5fd');
+  tg.addColorStop(0.5, '#ffffff');
+  tg.addColorStop(1, '#34d399');
+  ctx.fillStyle = tg;
+  ctx.font = "900 90px 'Arial Black', Arial, sans-serif";
+  ctx.fillText('CEO', 300, 230);
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#e2e8f0';
+  ctx.font = "700 36px Arial, sans-serif";
+  ctx.fillText('SIMULATOR', 305, 280);
+
+  // 서브타이틀
+  ctx.fillStyle = 'rgba(148,163,184,0.9)';
+  ctx.font = "400 20px Arial, sans-serif";
+  ctx.fillText('1980 ~ 2050  ·  소프트웨어 기업 경영 시뮬레이터', 305, 330);
+
+  // 태그들
+  const tags = ['📈 시장 점유율', '💰 투자 유치', '🤖 AI 시대', '🏆 IPO'];
+  tags.forEach((tag, i) => {
+    const tx = 305 + i * 170;
+    ctx.fillStyle = 'rgba(59,130,246,0.15)';
+    ctx.beginPath();
+    ctx.roundRect(tx, 365, 155, 36, 8);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(59,130,246,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#93c5fd';
+    ctx.font = "600 14px Arial, sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillText(tag, tx + 77, 388);
+    ctx.textAlign = 'left';
+  });
+
+  // 우하단 차트 라인 장식
+  const pts = [[700,420],[750,380],[800,340],[850,290],[900,240],[950,190],[1000,150]];
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  pts.forEach(([x,y]) => ctx.lineTo(x, y));
+  ctx.strokeStyle = 'rgba(52,211,153,0.3)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // 테두리
+  ctx.strokeStyle = 'rgba(59,130,246,0.2)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, W-2, H-2);
+}
+
+// 실행
+drawIcon(document.getElementById('c512'), 512, 512);
+drawFeatureGraphic(document.getElementById('c1024'));
+
+function downloadAll() {
+  // 아이콘 512×512
+  const a1 = document.createElement('a');
+  a1.download = 'icon-512.png';
+  a1.href = document.getElementById('c512').toDataURL('image/png');
+  a1.click();
+
+  setTimeout(() => {
+    // 피처 그래픽 1024×500
+    const a2 = document.createElement('a');
+    a2.download = 'feature-graphic-1024x500.png';
+    a2.href = document.getElementById('c1024').toDataURL('image/png');
+    a2.click();
+  }, 500);
+}
+</script>
+</body>
+</html>

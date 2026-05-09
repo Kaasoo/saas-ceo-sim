@@ -1,0 +1,26 @@
+# 의존성
+node_modules/
+
+# Android 빌드 산출물
+android/app/build/
+android/.gradle/
+android/local.properties
+
+# 키스토어 & 서명 비밀 (절대 공개 금지)
+*.jks
+*.keystore
+android/keystore.properties
+
+# 저장 데이터
+saves/
+
+# Claude Code 내부 파일
+.claude/
+
+# 로그
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
