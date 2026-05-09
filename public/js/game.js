@@ -4570,22 +4570,22 @@ function _briefCompetitors(h) {
   const alive = G.competitors.filter(c => c.alive);
   const dead  = G.competitors.filter(c => !c.alive);
 
-  // 상대 점유율
-  const named = G.marketShare + alive.reduce((s, c) => s + (c.marketShare || 0), 0);
-  const myRel = named > 0 ? G.marketShare / named * 100 : 0;
+  // 절대 점유율 기준 (전체 TAM 대비) — 실적 탭과 동일한 기준으로 통일
+  const myShare = G.marketShare || 0;
+  const maxShare = Math.max(myShare, ...alive.map(c => c.marketShare || 0), 0.001);
 
   const compRows = alive
     .sort((a, b) => (b.marketShare || 0) - (a.marketShare || 0))
     .map(c => {
-      const relShare = named > 0 ? ((c.marketShare || 0) / named * 100) : 0;
-      const isThreat = relShare > myRel * 0.7;
-      const rowClass = isThreat ? 'threat' : (relShare < 2 ? 'weak' : '');
+      const absShare = (c.marketShare || 0) * 100;
+      const isThreat = (c.marketShare || 0) >= myShare * 0.7;
+      const rowClass = isThreat ? 'threat' : ((c.marketShare || 0) < myShare * 0.3 ? 'weak' : '');
       return `
         <tr class="${rowClass}">
           <td class="comp-name">${c.name}</td>
-          <td>${relShare.toFixed(1)}%
+          <td>${absShare.toFixed(2)}%
             <div class="brief-share-bar">
-              <div class="brief-share-bar-fill" style="width:${Math.min(100, relShare / (myRel || 1) * 100)}%;
+              <div class="brief-share-bar-fill" style="width:${Math.min(100, (c.marketShare||0) / maxShare * 100)}%;
                 background:${isThreat ? 'var(--amber)' : 'var(--blue)'}"></div>
             </div>
           </td>
@@ -4597,13 +4597,13 @@ function _briefCompetitors(h) {
   const tableHtml = alive.length > 0 ? `
     <table class="brief-comp-table">
       <thead><tr>
-        <th>경쟁사</th><th>점유율</th><th>전략</th><th>위협</th>
+        <th>경쟁사</th><th>점유율 (시장 전체)</th><th>전략</th><th>위협</th>
       </tr></thead>
       <tbody>${compRows}</tbody>
     </table>` : `<div class="brief-ok">✅ 현재 살아있는 경쟁사가 없습니다. 시장을 독점하고 있어요.</div>`;
 
-  // 인수 가능 경쟁사 (약한 경쟁사 추천)
-  const acquirables = alive.filter(c => (c.marketShare || 0) < 0.03 && G.cash > 500000);
+  // 인수 검토 대상 — 내 점유율보다 낮은 경쟁사
+  const acquirables = alive.filter(c => (c.marketShare || 0) < myShare * 0.8 && G.cash > 500000);
   const acquireHtml = acquirables.length > 0 ? `
     <div class="brief-section">
       <div class="brief-section-title">💡 인수 검토 대상</div>
@@ -4611,22 +4611,22 @@ function _briefCompetitors(h) {
         const estPrice = Math.round((c.marketShare || 0.005) * getMarketSize(G.year, G.quarter) * 8 / 1e5) * 1e5;
         return `<div class="brief-acquire-card">
           <div class="brief-acquire-name">${c.name}</div>
-          <div class="brief-acquire-desc">점유율 ${((c.marketShare||0)*100).toFixed(2)}% — 시장 영향력이 약화된 경쟁사입니다. 인수 시 기술·고객 흡수 가능.</div>
+          <div class="brief-acquire-desc">점유율 ${((c.marketShare||0)*100).toFixed(2)}% — 우리보다 점유율이 낮은 경쟁사입니다. 인수 시 기술·고객 흡수 가능.</div>
           <div class="brief-acquire-price">💰 추정 인수가 ${fmt(estPrice)} (이벤트 발생 시 선택 가능)</div>
         </div>`;
       }).join('')}
     </div>` : '';
 
   // 비서 코멘트
-  const topThreat = alive.sort((a,b)=>(b.marketShare||0)-(a.marketShare||0))[0];
+  const topThreat = alive.slice().sort((a,b)=>(b.marketShare||0)-(a.marketShare||0))[0];
   const comment = topThreat
-    ? `현재 가장 강력한 경쟁사는 <strong>${topThreat.name}</strong> (점유율 ${((topThreat.marketShare||0)/named*100).toFixed(1)}%)입니다.${
+    ? `현재 가장 강력한 경쟁사는 <strong>${topThreat.name}</strong> (점유율 ${((topThreat.marketShare||0)*100).toFixed(2)}%)입니다.${
         (topThreat.quality || 0) > (h.quality || 0) ? ' 제품 품질에서도 우위에 있어 R&D 투자 강화를 권고드립니다.' : ''}`
     : '현재 시장에서 우리 회사의 위치가 안정적입니다.';
 
   return `
     <div class="brief-section">
-      <div class="brief-section-title">경쟁사 현황 (내 점유율 ${myRel.toFixed(1)}%)</div>
+      <div class="brief-section-title">경쟁사 현황 (내 점유율 ${(myShare*100).toFixed(2)}%)</div>
       ${tableHtml}
     </div>
     ${acquireHtml}
