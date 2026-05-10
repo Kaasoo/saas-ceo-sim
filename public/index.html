@@ -555,16 +555,16 @@
 </div>
 
 <!-- ══════════════════ PRE-QUARTER CHECK MODAL ══════════════════ -->
-<div class="modal-overlay" id="preq-modal">
-  <div class="modal-box" style="max-width:420px">
-    <div class="brief-header" style="padding:16px 20px 12px">
+<div class="modal-bg" id="preq-modal">
+  <div class="modal-box modal-brief" style="max-width:440px">
+    <div class="brief-header">
       <div class="brief-avatar" id="preq-avatar">🧑‍💼</div>
       <div class="brief-meta">
-        <div style="font-size:13px;font-weight:700;color:var(--text)" id="preq-title">분기 실행 전 점검</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">분기 실행 전 점검</div>
         <div class="brief-date" id="preq-date">Q1 1980</div>
       </div>
     </div>
-    <div style="padding:0 20px 16px;max-height:60vh;overflow-y:auto" id="preq-body"></div>
+    <div class="brief-body" id="preq-body" style="padding:16px 20px"></div>
     <div class="brief-footer">
       <button class="btn-ghost" onclick="closePreqModal()">수정하기</button>
       <button class="btn-next" style="width:auto;padding:10px 24px" onclick="closePreqModal();nextQuarter()">실행하기 →</button>
