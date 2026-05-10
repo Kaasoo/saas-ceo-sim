@@ -1754,15 +1754,15 @@ const EVENT_FLOOR_DB = {
 };
 
 // ── 이벤트 투자금 계산 ──
-// costFrac: 연매출 대비 비율 (0.10 = 10%). 직전 분기 매출 × 4 를 기준으로 산출.
+// costFrac: 분기매출 대비 비율 (0.10 = 10%). 직전 분기 매출을 기준으로 산출.
 // floorM: 역사적 최소 투자금 ($M). EVENT_FLOOR_DB 에서 조회해 전달.
-// 매출이 없을 때는 시장규모 0.04%를 baseRev floor로 사용.
+// 매출이 없을 때는 시장규모 0.01%를 baseRev floor로 사용.
 function getEventChoiceCost(costFrac, floorM = 0) {
   if (!costFrac || costFrac <= 0) return 0;
   const lastQRev = G.history.length ? G.history[G.history.length - 1].rev : 0;
-  // 연매출(ARR) 기준 — 분기 매출의 4배를 투자 베이스로 사용하여 전략적 투자 규모 현실화
-  const mktFloor = getMarketSize(G.year, G.quarter) * 0.0004; // ~0.04% of annual market
-  const baseRev  = Math.max(lastQRev * 4, mktFloor);
+  // 분기매출 기준 (연매출 × 4 → 분기매출 × 1)
+  const mktFloor = getMarketSize(G.year, G.quarter) * 0.0001; // ~0.01% of quarterly market
+  const baseRev  = Math.max(lastQRev, mktFloor);
   const fracCost = Math.round(baseRev * costFrac);
   // 역사적 최소 투자금 floor 적용 (소규모 플레이어도 현실적 금액 표시)
   const minCost  = Math.round((floorM || 0) * 1_000_000);
@@ -4136,11 +4136,11 @@ function showEventModal(ev) {
       const fracOnly = (() => {
         if (!c.cost || c.cost <= 0) return 0;
         const lqr = G.history.length ? G.history[G.history.length - 1].rev : 0;
-        const mf   = getMarketSize(G.year, G.quarter) * 0.0004;
-        return Math.round(Math.max(lqr * 4, mf) * c.cost);
+        const mf   = getMarketSize(G.year, G.quarter) * 0.0001;
+        return Math.round(Math.max(lqr, mf) * c.cost);
       })();
       const isFloorActive = floorM > 0 && actualCost > fracOnly;
-      const pct = c.cost > 0 ? `연매출의 ${Math.round(c.cost * 100)}%` : '';
+      const pct = c.cost > 0 ? `분기매출의 ${Math.round(c.cost * 100)}%` : '';
       const floorNote = isFloorActive ? ` · 역사적 최소 $${floorM >= 1000 ? (floorM/1000).toFixed(1)+'B' : floorM+'M'} 적용` : '';
       const debtPct = debtExtra > 0 ? ` + 부채청산 ${fmt(debtExtra)}` : '';
       costLabel = `투자금: ${fmt(actualCost)}${pct ? ` (${pct}${floorNote})` : ''}${debtPct}` +
