@@ -452,7 +452,7 @@
 
   <!-- 다음 분기 버튼: 모바일에서 화면 최하단 고정 -->
   <div class="next-quarter-bar">
-    <button class="btn-next" onclick="nextQuarter()">
+    <button class="btn-next" onclick="preQuarterCheck()">
       다음 분기 실행 →
       <div class="btn-next-sub" id="btn-qinfo">Q1 1980</div>
     </button>
@@ -519,7 +519,7 @@
     <div class="res-grid" id="res-grid"></div>
     <div id="res-margin-tag" class="res-margin-tag"></div>
     <div class="res-news" id="res-news"></div>
-    <button class="btn-primary" onclick="closeResults()">비서 브리핑 받기 →</button>
+    <button class="btn-confirm" onclick="closeResults()">비서 브리핑 받기 →</button>
   </div>
 </div>
 
@@ -549,7 +549,25 @@
     <!-- 하단 버튼 -->
     <div class="brief-footer">
       <button class="brief-next-tab btn-ghost" id="brief-next-btn" onclick="briefNextTab()">다음 ›</button>
-      <button class="btn-primary" id="brief-close-btn" onclick="closeBrief()" style="display:none">다음 분기 준비 →</button>
+      <button class="btn-confirm" id="brief-close-btn" onclick="closeBrief()" style="display:none">다음 분기 준비 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PRE-QUARTER CHECK MODAL ══════════════════ -->
+<div class="modal-overlay" id="preq-modal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="brief-header" style="padding:16px 20px 12px">
+      <div class="brief-avatar" id="preq-avatar">🧑‍💼</div>
+      <div class="brief-meta">
+        <div style="font-size:13px;font-weight:700;color:var(--text)" id="preq-title">분기 실행 전 점검</div>
+        <div class="brief-date" id="preq-date">Q1 1980</div>
+      </div>
+    </div>
+    <div style="padding:0 20px 16px;max-height:60vh;overflow-y:auto" id="preq-body"></div>
+    <div class="brief-footer">
+      <button class="btn-ghost" onclick="closePreqModal()">수정하기</button>
+      <button class="btn-next" style="width:auto;padding:10px 24px" onclick="closePreqModal();nextQuarter()">실행하기 →</button>
     </div>
   </div>
 </div>

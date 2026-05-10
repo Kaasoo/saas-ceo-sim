@@ -85,6 +85,18 @@ button{cursor:pointer;font-family:inherit}
 }
 .btn-primary:hover{background:var(--blue2)}
 
+/* 비서 브리핑 / 다음 분기 준비 — 파란 버튼과 구분되는 초록 계열 */
+.btn-confirm{
+  display:block;width:100%;
+  padding:14px;margin-top:4px;
+  background:linear-gradient(135deg,#059669,#10b981);color:#fff;
+  font-size:14px;font-weight:700;letter-spacing:.5px;
+  border:none;border-radius:4px;
+  transition:opacity .15s;
+}
+.btn-confirm:hover{opacity:.88}
+.btn-confirm:active{opacity:.75}
+
 .intro-feat{
   display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;
 }

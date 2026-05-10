@@ -2313,6 +2313,8 @@ function processTurn() {
       c.alive && _namedTotal > 0 ? c.marketShare / _namedTotal : 0),
     compRevenues: G.competitors.map(c => c.revenue  || 0),
     compProfits:  G.competitors.map(c => c.profit   || 0),
+    // 이번 분기에 사용된 의사결정 값 (다음 분기 QoQ 비교용)
+    _dsRD: decisionState.rd, _dsMkt: decisionState.mkt,
   });
 
   // 11. Check game conditions
@@ -5324,6 +5326,97 @@ function showCatchupModal(debtIdx) {
   showEventModal(pendingEvent);
 }
 
+// ── 분기 실행 전 비서 점검 ────────────────────────────────────────────────
+function preQuarterCheck() {
+  const ds   = decisionState;
+  const prev = G.history.length ? G.history[G.history.length - 1] : null;
+  const items = [];
+
+  // ① 예산 변동 — 전 분기 결산 대비
+  const prevRD  = prev ? (prev._dsRD  ?? null) : null;
+  const prevMkt = prev ? (prev._dsMkt ?? null) : null;
+  const rdDelta  = prevRD  !== null ? Math.round((ds.rd  - prevRD)  / Math.max(1, prevRD)  * 100) : null;
+  const mktDelta = prevMkt !== null ? Math.round((ds.mkt - prevMkt) / Math.max(1, prevMkt) * 100) : null;
+
+  const budgetLines = [
+    `R&D: <strong>${fmt(ds.rd)}</strong>${rdDelta !== null  ? ` <span style="color:${rdDelta  >= 0?'var(--green)':'var(--red)'}">(${rdDelta  >= 0?'+':''}${rdDelta}%)</span>`  : ''}`,
+    `마케팅: <strong>${fmt(ds.mkt)}</strong>${mktDelta !== null ? ` <span style="color:${mktDelta >= 0?'var(--green)':'var(--red)'}">(${mktDelta >= 0?'+':''}${mktDelta}%)</span>` : ''}`,
+    `HR: <strong>${fmt(ds.hr)}</strong>`,
+  ];
+  items.push({ icon: '💰', title: '예산 배분', body: budgetLines.join(' &nbsp;·&nbsp; '), warn: false });
+
+  // ② 인원 충원 — 최소 요구 인원 대비
+  const minEmp = calcMinEmployees();
+  const gap    = Math.max(0, minEmp - G.employees);
+  const hiring = ds.hire || 0;
+  if (gap > 0 && hiring < gap) {
+    items.push({
+      icon: '⚠️', title: '인원 부족 경고', warn: true,
+      body: `최소 필요 <strong>${minEmp}명</strong> / 현재 <strong>${G.employees}명</strong> (부족 ${gap - hiring}명).<br>인력 부족 시 매출 페널티가 발생합니다.`,
+    });
+  } else {
+    items.push({
+      icon: '👥', title: '인원 현황', warn: false,
+      body: `현재 <strong>${G.employees}명</strong> (필요 최소 ${minEmp}명) — 충원 충분`,
+    });
+  }
+
+  // ③ 가격 포지셔닝
+  const priceIdx = ds.price || 1.0;
+  const alive    = G.competitors.filter(c => c.alive);
+  const avgCompPrice = alive.length
+    ? alive.reduce((s, c) => s + (c.priceIndex || 1.0), 0) / alive.length
+    : 1.0;
+  const priceLabel = priceIdx >= 1.3 ? '프리미엄 💎'
+                   : priceIdx >= 1.05 ? '표준 이상 📊'
+                   : priceIdx >= 0.95 ? '시장 표준 ⚖️'
+                   : '저가 할인 🏷️';
+  const priceWarn  = (priceIdx > avgCompPrice * 1.4) || (priceIdx < avgCompPrice * 0.6);
+  items.push({
+    icon: '🏷️', title: '가격 포지셔닝', warn: priceWarn,
+    body: `현재 가격 지수 <strong>${priceIdx.toFixed(2)}</strong> (${priceLabel}) / 경쟁사 평균 <strong>${avgCompPrice.toFixed(2)}</strong>`
+        + (priceWarn ? `<br><span style="color:var(--amber)">경쟁사와의 가격 차이가 큽니다. 고객 이탈에 주의하세요.</span>` : ''),
+  });
+
+  // ④ 현금 runway
+  const burnRate = prev ? Math.max(0, prev.cash - G.cash) : 0;
+  if (burnRate > 0 && G.cash / burnRate < 4) {
+    items.push({
+      icon: '🚨', title: '현금 런웨이 경고', warn: true,
+      body: `잔여 현금 <strong>${fmt(G.cash)}</strong> / 분기 소진 약 ${fmt(burnRate)} → <strong>${Math.floor(G.cash / burnRate)}분기</strong> 남음. 자금 조달을 검토하세요.`,
+    });
+  }
+
+  // 비서 총평
+  const warnCount = items.filter(i => i.warn).length;
+  const overall   = warnCount === 0
+    ? { emoji: '✅', msg: '모든 지표가 양호합니다. 분기를 실행해도 좋습니다.' }
+    : warnCount === 1
+    ? { emoji: '⚠️', msg: '주의 항목이 있습니다. 확인 후 실행하세요.' }
+    : { emoji: '🚨', msg: `${warnCount}개 항목에서 위험 신호가 감지됩니다. 신중히 검토하세요.` };
+
+  const html = `
+    <div class="brief-bubble" style="margin-bottom:12px">
+      ${overall.emoji} ${overall.msg}
+    </div>
+    ${items.map(it => `
+      <div class="brief-section" style="margin-bottom:10px;padding:10px 12px;border-radius:6px;
+        background:${it.warn ? 'rgba(245,158,11,.08)' : 'var(--bg3)'};
+        border:1px solid ${it.warn ? 'rgba(245,158,11,.35)' : 'var(--line)'}">
+        <div class="brief-section-title" style="margin-bottom:4px">${it.icon} ${it.title}</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">${it.body}</div>
+      </div>`).join('')}`;
+
+  document.getElementById('preq-avatar').textContent = warnCount === 0 ? '🧑‍💼' : warnCount === 1 ? '🤔' : '😰';
+  document.getElementById('preq-date').textContent   = `Q${G.quarter} ${G.year} 실행 전 점검`;
+  document.getElementById('preq-body').innerHTML     = html;
+  document.getElementById('preq-modal').classList.add('open');
+}
+
+function closePreqModal() {
+  document.getElementById('preq-modal').classList.remove('open');
+}
+
 function nextQuarter() {
   // 0. Catch-up opportunities for unresolved tech debt fire BEFORE regular events
   if (checkCatchupEvent()) {
@@ -5576,8 +5669,8 @@ function _closeMenuOutside(e) {
 }
 function confirmMainMenu() {
   document.getElementById('game-menu-dropdown').classList.remove('open');
-  if (confirm('메인 메뉴로 돌아가시겠습니까?\n(저장하지 않은 진행상황은 사라집니다)')) {
-    autoSave(); // 메인 메뉴 이동 전 현재 상태 자동저장
+  if (confirm('메인 메뉴로 돌아가시겠습니까?\n(현재 진행 중인 게임은 자동저장 됩니다)')) {
+    autoSave();
     resetGame();
   }
 }
