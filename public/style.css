@@ -1191,3 +1191,94 @@ button{cursor:pointer;font-family:inherit}
   .kpi-label{font-size:11px}
   .kpi-val{font-size:18px}
 }
+
+/* ── QUARTER RUN OVERLAY ── */
+#qrun-overlay {
+  display: none; position: fixed; inset: 0; z-index: 600;
+  background: rgba(6,9,18,0.97); backdrop-filter: blur(12px);
+  align-items: center; justify-content: center;
+}
+#qrun-overlay.active { display: flex; }
+
+.qrun-inner {
+  width: min(92%, 420px);
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 36px 24px 24px;
+}
+.qrun-period {
+  text-align: center; line-height: 1;
+}
+.qrun-q {
+  font-size: 18px; font-weight: 700;
+  color: var(--blue); letter-spacing: 3px; text-transform: uppercase;
+}
+.qrun-year {
+  display: block; font-size: 56px; font-weight: 900;
+  color: var(--text); letter-spacing: -2px;
+  text-shadow: 0 0 40px rgba(59,130,246,.4);
+  margin-top: 4px;
+}
+.qrun-running {
+  text-align: center; font-size: 11px; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase; margin-top: -8px;
+}
+.qrun-dots::after {
+  content: ''; animation: qrun-dots 1.2s steps(4, end) infinite;
+}
+@keyframes qrun-dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
+}
+.qrun-hl-box {
+  background: var(--bg2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 14px 16px; min-height: 80px;
+}
+.qrun-hl-tag {
+  font-size: 9px; color: var(--muted); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.qrun-headline {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  line-height: 1.55; transition: opacity 0.25s ease;
+}
+.qrun-headline.fade { opacity: 0; }
+
+.qrun-stats {
+  display: flex; gap: 8px;
+}
+.qrun-stat {
+  flex: 1; background: var(--bg3);
+  border: 1px solid var(--line); border-radius: 6px;
+  padding: 8px; text-align: center;
+}
+.qrun-stat-label {
+  font-size: 9px; color: var(--muted); letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.qrun-stat-val {
+  font-size: 14px; font-weight: 700; color: var(--text); margin-top: 3px;
+}
+
+.qrun-comment {
+  font-size: 12px; color: var(--muted); text-align: center;
+  font-style: italic; min-height: 16px; line-height: 1.5;
+}
+
+.qrun-bar-wrap {
+  height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden;
+}
+.qrun-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  border-radius: 2px;
+}
+
+.qrun-skip {
+  align-self: center; font-size: 11px; color: var(--muted);
+  background: none; border: none; cursor: pointer; padding: 4px 12px;
+  letter-spacing: 1px;
+}
+.qrun-skip:hover { color: var(--text); }

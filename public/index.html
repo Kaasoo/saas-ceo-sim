@@ -567,8 +567,29 @@
     <div class="brief-body" id="preq-body" style="padding:16px 20px"></div>
     <div class="brief-footer">
       <button class="btn-ghost" onclick="closePreqModal()">수정하기</button>
-      <button class="btn-next" style="width:auto;padding:10px 24px" onclick="closePreqModal();nextQuarter()">실행하기 →</button>
+      <button class="btn-next" style="width:auto;padding:10px 24px" onclick="closePreqModal();launchQuarterRun()">실행하기 →</button>
     </div>
+  </div>
+</div>
+
+<!-- ══════════════════ QUARTER RUN OVERLAY ══════════════════ -->
+<div id="qrun-overlay">
+  <div class="qrun-inner">
+    <div class="qrun-period">
+      <span class="qrun-q" id="qrun-q">Q1</span>
+      <span class="qrun-year" id="qrun-year">1980</span>
+    </div>
+    <div class="qrun-running">분기 진행 중<span class="qrun-dots"></span></div>
+    <div class="qrun-hl-box">
+      <div class="qrun-hl-tag">📰 시대 헤드라인</div>
+      <div class="qrun-headline" id="qrun-headline"></div>
+    </div>
+    <div class="qrun-stats" id="qrun-stats"></div>
+    <div class="qrun-comment" id="qrun-comment"></div>
+    <div class="qrun-bar-wrap">
+      <div class="qrun-bar" id="qrun-bar"></div>
+    </div>
+    <button class="qrun-skip" onclick="skipQuarterRun()">건너뛰기 ›</button>
   </div>
 </div>
 
@@ -584,6 +605,7 @@
   </div>
 </div>
 
+<script src="js/headlines.js"></script>
 <script src="js/game.js"></script>
 </body>
 </html>
