@@ -5491,7 +5491,7 @@ function launchQuarterRun() {
   bar.style.transition = `width ${QRUN_DURATION}ms linear`;
   bar.style.width = '100%';
 
-  document.getElementById('qrun-overlay').classList.add('active');
+  document.getElementById('qrun-overlay').classList.add('open');
 
   _qrunTimer = setTimeout(finishQuarterRun, QRUN_DURATION);
 }
@@ -5499,7 +5499,7 @@ function launchQuarterRun() {
 function finishQuarterRun() {
   clearTimeout(_qrunTimer);
   clearInterval(_qrunHlTimer);
-  document.getElementById('qrun-overlay').classList.remove('active');
+  document.getElementById('qrun-overlay').classList.remove('open');
   nextQuarter();
 }
 

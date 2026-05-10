@@ -1193,22 +1193,8 @@ button{cursor:pointer;font-family:inherit}
 }
 
 /* ── QUARTER RUN OVERLAY ── */
-#qrun-overlay {
-  display: none;
-  position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;   /* inset 대신 명시적 TRBL */
-  width: 100%; height: 100%;               /* 추가 보험 */
-  z-index: 600;
-  background: rgba(6,9,18,0.97);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  -webkit-align-items: center;
-  align-items: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  overflow-y: auto;                        /* 내용 넘칠 때 스크롤 */
-}
-#qrun-overlay.active { display: -webkit-flex; display: flex; }
+/* 오버레이 자체는 .modal-bg.open 패턴을 그대로 사용 (모바일 호환) */
+#qrun-overlay { z-index: 600; background: rgba(6,9,18,0.97); }
 
 .qrun-inner {
   width: 92%; max-width: 420px;           /* min() 대신 명시적 max-width */
