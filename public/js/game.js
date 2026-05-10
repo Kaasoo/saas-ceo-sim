@@ -5486,18 +5486,39 @@ function saveGame() { openSaveModal(); }
 const AUTO_SAVE_KEY = 'ceosim_autosave';
 
 function autoSave() {
-  if (!G || !G.year) return;
+  if (!G || !G.year) { console.warn('[autoSave] skipped: G.year =', G && G.year); return; }
   try {
     const data = { ...G, firedEvents: [...G.firedEvents], _decisionState: decisionState };
-    localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(data));
-  } catch(e) {}
+    const json = JSON.stringify(data);
+    localStorage.setItem(AUTO_SAVE_KEY, json);
+    console.log('[autoSave] saved', json.length, 'bytes, year=', G.year, 'q=', G.quarter);
+  } catch(e) { console.error('[autoSave] FAILED:', e); }
 }
 
 function loadAutoSave() {
   try {
     const raw = localStorage.getItem(AUTO_SAVE_KEY);
+    console.log('[loadAutoSave] raw length=', raw ? raw.length : null);
     return raw ? JSON.parse(raw) : null;
-  } catch(e) { return null; }
+  } catch(e) { console.error('[loadAutoSave] FAILED:', e); return null; }
+}
+
+function refreshContinueButton() {
+  const btn = document.getElementById('btn-continue');
+  const sub = document.getElementById('btn-continue-sub');
+  if (!btn) { console.warn('[refreshContinueButton] btn-continue element not found'); return; }
+  const saved = loadAutoSave();
+  console.log('[refreshContinueButton] saved=', saved && { year: saved.year, quarter: saved.quarter, name: saved.name });
+  if (saved && saved.year) {
+    const h = saved.history && saved.history[saved.history.length - 1];
+    const cash = h ? fmt(h.cash) : '—';
+    sub.textContent = `${saved.name || '—'} · Q${saved.quarter} ${saved.year} · 현금 ${cash}`;
+    btn.style.display = '';
+    console.log('[refreshContinueButton] button shown');
+  } else {
+    btn.style.display = 'none';
+    console.log('[refreshContinueButton] button hidden (no valid save)');
+  }
 }
 
 function continueGame() {
@@ -5516,21 +5537,6 @@ function continueGame() {
   document.getElementById('sl-hr').value    = Math.round((ds.hr    || 0)     / 1000);
   document.getElementById('sl-price').value = Math.round((ds.price || 1.0)   * 100);
   syncSlider('rd'); syncSlider('mkt'); syncSlider('hr'); syncPrice();
-}
-
-function refreshContinueButton() {
-  const btn = document.getElementById('btn-continue');
-  const sub = document.getElementById('btn-continue-sub');
-  if (!btn) return;
-  const saved = loadAutoSave();
-  if (saved && saved.year) {
-    const h = saved.history && saved.history[saved.history.length - 1];
-    const cash = h ? fmt(h.cash) : '—';
-    sub.textContent = `${saved.name || '—'} · Q${saved.quarter} ${saved.year} · 현금 ${cash}`;
-    btn.style.display = '';
-  } else {
-    btn.style.display = 'none';
-  }
 }
 
 function loadGame(slot) {
