@@ -5420,11 +5420,11 @@ function closePreqModal() {
 // ── 분기 진행 인터루드 ──────────────────────────────────────────────
 let _qrunTimer = null;
 let _qrunHlTimer = null;
-const QRUN_DURATION = 3000; // ms
-const QRUN_HL_INTERVAL = 850; // ms per headline
+const QRUN_DURATION = 5000;     // ms — 분기 인터루드 표시 시간
+const QRUN_HL_INTERVAL = 1100;  // ms per headline
 
 function getHeadlinesForYear(year) {
-  if (!window.HEADLINES) return ['분기가 진행 중입니다...'];
+  if (typeof HEADLINES === 'undefined') return ['분기가 진행 중입니다...'];
   const keys = Object.keys(HEADLINES).map(Number).sort((a, b) => a - b);
   // Gather headlines from current year ±3
   const pool = [];
