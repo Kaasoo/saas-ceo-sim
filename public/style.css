@@ -1231,19 +1231,75 @@ button{cursor:pointer;font-family:inherit}
   75%  { content: '...'; }
   100% { content: ''; }
 }
-.qrun-hl-box {
-  background: var(--bg2); border: 1px solid var(--line);
-  border-radius: 8px; padding: 14px 16px; min-height: 80px;
-}
-.qrun-hl-tag {
-  font-size: 9px; color: var(--muted); letter-spacing: 2px;
-  text-transform: uppercase; margin-bottom: 8px;
-}
-.qrun-headline {
-  font-size: 13px; font-weight: 600; color: var(--text);
-  line-height: 1.55; transition: opacity 0.25s ease;
-}
+/* headline text — 공통 */
+.qrun-headline { transition: opacity 0.3s ease; line-height: 1.5; }
 .qrun-headline.fade { opacity: 0; }
+
+/* ── 신문 스타일 (1980~1999) ── */
+.qrun-newspaper {
+  background:#16110a; border:2px solid #7a6040;
+  border-radius:3px; padding:14px 16px; min-height:90px;
+}
+.qrun-paper-masthead {
+  display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:3px double #7a6040; padding-bottom:7px; margin-bottom:10px;
+}
+.qrun-paper-name {
+  font-size:12px; font-weight:900; letter-spacing:3px;
+  color:#c8a86a; text-transform:uppercase;
+}
+.qrun-paper-date { font-size:9px; color:#7a6040; }
+.qrun-newspaper .qrun-headline {
+  font-size:14px; font-weight:800; color:#e8d5b0;
+  font-style:italic; letter-spacing:.2px;
+}
+
+/* ── TV 방송 스타일 (2000~2014) ── */
+.qrun-tv {
+  background:#080808; border:2px solid #222;
+  border-radius:4px; overflow:hidden; min-height:90px;
+}
+.qrun-tv-bar {
+  background:linear-gradient(90deg,#b30000,#cc0000);
+  padding:5px 12px; display:flex; align-items:center; gap:10px;
+}
+.qrun-tv-live {
+  font-size:10px; font-weight:900; color:#fff; letter-spacing:2px;
+  animation:blink-live 1.1s infinite;
+}
+@keyframes blink-live { 0%,100%{opacity:1} 50%{opacity:.3} }
+.qrun-tv-network {
+  font-size:9px; color:rgba(255,255,255,.85); letter-spacing:1px; flex:1;
+  text-align:center; text-transform:uppercase;
+}
+.qrun-tv-time-badge { font-size:9px; color:rgba(255,255,255,.7); }
+.qrun-tv-body { padding:12px 14px 8px; }
+.qrun-tv .qrun-headline { font-size:14px; font-weight:700; color:#fff; }
+.qrun-tv-lower {
+  background:#1a3a70; padding:5px 12px;
+  font-size:10px; color:#fff; font-weight:600;
+  display:flex; align-items:center; gap:8px;
+  white-space:nowrap; overflow:hidden;
+}
+.qrun-tv-breaking {
+  background:#cc0000; padding:1px 6px; border-radius:2px;
+  font-size:9px; letter-spacing:1px; flex-shrink:0;
+}
+
+/* ── 디지털/소셜 스타일 (2015~) ── */
+.qrun-digital {
+  background:var(--bg2); border:1px solid rgba(59,130,246,.35);
+  border-radius:10px; padding:14px 16px; min-height:90px;
+}
+.qrun-dig-top {
+  display:flex; align-items:center; gap:6px; margin-bottom:10px;
+}
+.qrun-dig-trending {
+  font-size:10px; font-weight:700; color:var(--blue); letter-spacing:.5px;
+}
+.qrun-dig-time { font-size:9px; color:var(--muted); margin-left:auto; }
+.qrun-digital .qrun-headline { font-size:14px; font-weight:700; color:var(--text); }
+.qrun-dig-meta { font-size:10px; color:var(--muted); margin-top:8px; }
 
 .qrun-stats {
   display: flex; gap: 8px;

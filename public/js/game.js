@@ -5420,17 +5420,15 @@ function closePreqModal() {
 // ── 분기 진행 인터루드 ──────────────────────────────────────────────
 let _qrunTimer = null;
 let _qrunHlTimer = null;
-const QRUN_DURATION = 5000;     // ms — 분기 인터루드 표시 시간
-const QRUN_HL_INTERVAL = 1100;  // ms per headline
+const QRUN_DURATION    = 5000;  // ms — 인터루드 총 길이
+const QRUN_HL_INTERVAL = 1650;  // ms per headline (기존 1100 × 1.5)
 
 function getHeadlinesForYear(year) {
   if (typeof HEADLINES === 'undefined') return ['분기가 진행 중입니다...'];
   const keys = Object.keys(HEADLINES).map(Number).sort((a, b) => a - b);
-  // Gather headlines from current year ±3
   const pool = [];
   keys.filter(k => Math.abs(k - year) <= 3).forEach(k => pool.push(...HEADLINES[k]));
   if (pool.length) return pool;
-  // Fallback: nearest year
   const nearest = keys.reduce((a, b) => Math.abs(b - year) < Math.abs(a - year) ? b : a);
   return HEADLINES[nearest] || ['분기가 진행 중입니다...'];
 }
@@ -5440,50 +5438,104 @@ function _qrunSecretaryComment() {
   const alive = G.competitors.filter(c => c.alive).length;
   const minEmp = calcMinEmployees();
   if (G.cash < 0) return '현금이 바닥났습니다. 긴급 자금 조달이 필요합니다.';
-  if (G.employees < minEmp * 0.8) return `인력이 부족합니다. 충원 없이는 매출 손실이 발생할 수 있습니다.`;
+  if (G.employees < minEmp * 0.8) return '인력이 부족합니다. 충원 없이는 매출 손실이 발생합니다.';
   if (h && h.profit < 0) return '비용 절감과 수익성 개선이 시급합니다.';
   if (alive <= 1) return '경쟁사들이 거의 사라졌습니다. 시장 지배력을 강화하세요.';
   if (alive >= 4) return `${alive}개 경쟁사가 치열하게 움직이고 있습니다.`;
-  const comments = [
-    '영업팀이 새로운 고객 확보에 나서고 있습니다.',
-    '개발팀이 기능 개선에 집중하고 있습니다.',
-    '경쟁사들의 동향을 면밀히 모니터링 중입니다.',
-    '시장 반응이 집계되고 있습니다.',
-    '고객 피드백을 분석하고 있습니다.',
-  ];
-  return comments[Math.floor(Math.random() * comments.length)];
+  const c = ['영업팀이 새로운 고객 확보에 나서고 있습니다.',
+             '개발팀이 기능 개선에 집중하고 있습니다.',
+             '경쟁사들의 동향을 면밀히 모니터링 중입니다.',
+             '시장 반응이 집계되고 있습니다.',
+             '고객 피드백을 분석하고 있습니다.'];
+  return c[Math.floor(Math.random() * c.length)];
+}
+
+// 연도별 미디어 형태: 신문 / TV방송 / 디지털
+function _qrunMediaType(year) {
+  if (year < 2000) return 'newspaper';
+  if (year < 2015) return 'tv';
+  return 'digital';
+}
+
+function _buildMediaFrame(year, headline) {
+  const type = _qrunMediaType(year);
+  const hl   = headline.replace(/^📰\s*/, ''); // 이모지 제거 (프레임이 대체)
+  const qStr = `Q${G.quarter} · ${year}`;
+
+  if (type === 'newspaper') {
+    return `<div class="qrun-newspaper">
+      <div class="qrun-paper-masthead">
+        <span class="qrun-paper-name">THE TECH GAZETTE</span>
+        <span class="qrun-paper-date">${qStr}</span>
+      </div>
+      <div class="qrun-headline" id="qrun-headline">${hl}</div>
+    </div>`;
+  }
+  if (type === 'tv') {
+    return `<div class="qrun-tv">
+      <div class="qrun-tv-bar">
+        <span class="qrun-tv-live">● LIVE</span>
+        <span class="qrun-tv-network">TECH NEWS NETWORK</span>
+        <span class="qrun-tv-time-badge">${qStr}</span>
+      </div>
+      <div class="qrun-tv-body">
+        <div class="qrun-headline" id="qrun-headline">${hl}</div>
+      </div>
+      <div class="qrun-tv-lower">
+        <span class="qrun-tv-breaking">BREAKING</span>${hl}
+      </div>
+    </div>`;
+  }
+  // digital
+  const tags  = ['#Tech','#AI','#Business','#Startup','#Innovation','#SaaS','#Cloud'];
+  const t1    = tags[Math.floor(Math.random() * tags.length)];
+  const t2    = tags[Math.floor(Math.random() * tags.length)];
+  const shares = Math.floor(Math.random() * 500 + 50);
+  const likes  = Math.floor(Math.random() * 2000 + 100);
+  return `<div class="qrun-digital">
+    <div class="qrun-dig-top">
+      <span class="qrun-dig-trending">🌐 TRENDING NOW</span>
+      <span class="qrun-dig-time">${qStr}</span>
+    </div>
+    <div class="qrun-headline" id="qrun-headline">${hl}</div>
+    <div class="qrun-dig-meta">
+      <span style="color:var(--blue)">${t1} ${t2}</span>
+      &nbsp;·&nbsp; ♺ ${shares}K &nbsp;·&nbsp; ♡ ${likes}K
+    </div>
+  </div>`;
 }
 
 function launchQuarterRun() {
-  const named = G.marketShare + G.competitors.reduce((s, c) => s + (c.alive ? (c.marketShare || 0) : 0), 0);
+  const named    = G.marketShare + G.competitors.reduce((s, c) => s + (c.alive ? (c.marketShare || 0) : 0), 0);
   const relShare = named > 0 ? (G.marketShare / named * 100).toFixed(1) : '—';
 
-  document.getElementById('qrun-q').textContent   = `Q${G.quarter}`;
-  document.getElementById('qrun-year').textContent = G.year;
-  document.getElementById('qrun-stats').innerHTML  = `
+  document.getElementById('qrun-q').textContent    = `Q${G.quarter}`;
+  document.getElementById('qrun-year').textContent  = G.year;
+  document.getElementById('qrun-stats').innerHTML   = `
     <div class="qrun-stat"><div class="qrun-stat-label">현금</div><div class="qrun-stat-val">${fmt(G.cash)}</div></div>
     <div class="qrun-stat"><div class="qrun-stat-label">점유율</div><div class="qrun-stat-val">${relShare}%</div></div>
     <div class="qrun-stat"><div class="qrun-stat-label">직원</div><div class="qrun-stat-val">${G.employees}명</div></div>`;
   document.getElementById('qrun-comment').textContent = '🧑‍💼 "' + _qrunSecretaryComment() + '"';
 
-  // Headlines
+  // 헤드라인 — 첫 번째로 미디어 프레임 구성
   const headlines = getHeadlinesForYear(G.year);
   const shuffled  = headlines.slice().sort(() => Math.random() - 0.5);
   let hlIdx = 0;
-  const hlEl = document.getElementById('qrun-headline');
-  hlEl.classList.remove('fade');
-  hlEl.textContent = shuffled[0];
+  document.getElementById('qrun-media').innerHTML = _buildMediaFrame(G.year, shuffled[0]);
 
+  // 이후 헤드라인 rotation (id="qrun-headline"은 프레임 내부에 있음)
   _qrunHlTimer = setInterval(() => {
+    const hlEl = document.getElementById('qrun-headline');
+    if (!hlEl) return;
     hlEl.classList.add('fade');
     setTimeout(() => {
       hlIdx = (hlIdx + 1) % shuffled.length;
-      hlEl.textContent = shuffled[hlIdx];
-      hlEl.classList.remove('fade');
-    }, 260);
+      const newHl = shuffled[hlIdx].replace(/^📰\s*/, '');
+      if (hlEl) { hlEl.textContent = newHl; hlEl.classList.remove('fade'); }
+    }, 320);
   }, QRUN_HL_INTERVAL);
 
-  // Progress bar
+  // 프로그레스 바
   const bar = document.getElementById('qrun-bar');
   bar.style.transition = 'none';
   bar.style.width = '0%';
@@ -5492,7 +5544,6 @@ function launchQuarterRun() {
   bar.style.width = '100%';
 
   document.getElementById('qrun-overlay').classList.add('open');
-
   _qrunTimer = setTimeout(finishQuarterRun, QRUN_DURATION);
 }
 
