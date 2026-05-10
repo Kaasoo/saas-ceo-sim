@@ -1867,14 +1867,17 @@ function calcMinEmployees() {
   // ── 분기별 급증 방지: 전 분기 대비 최대 +20% 증가 ─────────────────────
   // 시장 점유율·시장 크기 급변으로 인한 채용 요구치 스파이크를 완화.
   // (단, 초기(0명) 또는 전환 직후에는 스무딩 없이 바로 적용)
+  // preview=true 로 호출하면 G._lastMinEmp 를 갱신하지 않음 (UI 미리보기용)
   const last = G._lastMinEmp || 0;
   const smoothed = last <= 1
     ? rawMin
     : Math.min(rawMin, Math.ceil(last * 1.20));
-  G._lastMinEmp = smoothed;
+  if (!calcMinEmployees._preview) G._lastMinEmp = smoothed;
 
   return smoothed;
 }
+// preview 플래그 (기본 false — preQuarterCheck 에서 true 로 설정하여 G._lastMinEmp 보존)
+calcMinEmployees._preview = false;
 
 // ── Target morale (0–100) based on HR investment, workload, finances ──
 function calcTargetMorale() {
@@ -5345,16 +5348,27 @@ function preQuarterCheck() {
   ];
   items.push({ icon: '💰', title: '예산 배분', body: budgetLines.join(' &nbsp;·&nbsp; '), warn: false });
 
-  // ② 인원 충원 — 최소 요구 인원 대비
+  // ② 인원 충원 — 최소 요구 인원 대비 (preview 모드로 G._lastMinEmp 불변)
+  calcMinEmployees._preview = true;
   const minEmp = calcMinEmployees();
+  calcMinEmployees._preview = false;
   const gap    = Math.max(0, minEmp - G.employees);
   const hiring = ds.hire || 0;
-  if (gap > 0 && hiring < gap) {
+  const afterHire = G.employees + hiring;
+  if (gap > 0 && afterHire < minEmp) {
+    // 채용 후에도 인원 부족
     items.push({
       icon: '⚠️', title: '인원 부족 경고', warn: true,
-      body: `최소 필요 <strong>${minEmp}명</strong> / 현재 <strong>${G.employees}명</strong> (부족 ${gap - hiring}명).<br>인력 부족 시 매출 페널티가 발생합니다.`,
+      body: `최소 필요 <strong>${minEmp}명</strong> / 현재 <strong>${G.employees}명</strong> + 채용 예정 <strong>${hiring}명</strong> = ${afterHire}명 (여전히 <strong>${minEmp - afterHire}명 부족</strong>).<br>인력 부족 시 매출 페널티가 발생합니다.`,
+    });
+  } else if (gap > 0 && afterHire >= minEmp) {
+    // 현재는 부족하지만 채용으로 충족 예정
+    items.push({
+      icon: '👥', title: '인원 현황', warn: false,
+      body: `현재 <strong>${G.employees}명</strong> + 채용 예정 <strong>${hiring}명</strong> → ${afterHire}명 (필요 최소 ${minEmp}명) — 채용 후 충원 충족`,
     });
   } else {
+    // 이미 충분
     items.push({
       icon: '👥', title: '인원 현황', warn: false,
       body: `현재 <strong>${G.employees}명</strong> (필요 최소 ${minEmp}명) — 충원 충분`,
@@ -5420,7 +5434,7 @@ function closePreqModal() {
 // ── 분기 진행 인터루드 ──────────────────────────────────────────────
 let _qrunTimer = null;
 let _qrunHlTimer = null;
-const QRUN_DURATION    = 5000;  // ms — 인터루드 총 길이
+const QRUN_DURATION    = 10000; // ms — 인터루드 총 길이 (기존 5000 × 2)
 const QRUN_HL_INTERVAL = 1650;  // ms per headline (기존 1100 × 1.5)
 
 function getHeadlinesForYear(year) {
