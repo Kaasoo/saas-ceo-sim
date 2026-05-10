@@ -95,6 +95,23 @@ button{cursor:pointer;font-family:inherit}
 }
 .feat-icon{font-size:16px}
 
+/* ── 이전 게임 이어하기 버튼 ── */
+.btn-continue{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  width:100%;padding:16px;margin-bottom:16px;
+  background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(59,130,246,.12));
+  border:1px solid rgba(16,185,129,.4);border-radius:8px;
+  color:var(--green);font-size:15px;font-weight:700;cursor:pointer;
+  transition:all .15s;
+}
+.btn-continue:hover{
+  background:linear-gradient(135deg,rgba(16,185,129,.25),rgba(59,130,246,.2));
+  border-color:var(--green);
+}
+.btn-continue-sub{
+  font-size:11px;font-weight:400;color:var(--muted);
+}
+
 /* ── SAVE SLOTS (intro) ── */
 .save-slots-wrap{
   width:100%;margin-bottom:24px;
