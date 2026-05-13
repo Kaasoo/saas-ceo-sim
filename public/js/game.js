@@ -1451,7 +1451,8 @@ function newGame(cfg) {
     // Competitors — 항상 1980 초창기 세트로 시작, 이후 시대 전환 시 실제 기업 자동 진입
     competitors: (() => {
       const set = ERA_COMPETITOR_SETS[1980];
-      return set.map(t => {
+      const playerNameLower = (cfg.name || '').toLowerCase();
+      return set.filter(t => t.name.toLowerCase() !== playerNameLower).map(t => {
         const s = t._s;
         const scale = s.giant ? 1.0 : compStr;
         return {
@@ -2491,6 +2492,7 @@ function checkEraEntrants() {
   groups.forEach(group => {
     group.competitors.forEach(t => {
       if (G.competitors.some(c => c.name === t.name)) return; // 이미 존재하면 스킵
+      if (t.name.toLowerCase() === (G.name || '').toLowerCase()) return; // 플레이어 회사명과 동일하면 스킵
       const s = t._s;
       G.competitors.push({
         name: t.name, icon: t.icon, color: t.color,
