@@ -2590,6 +2590,26 @@ function processCompetitors() {
   G.competitors.forEach(c => {
     if (!c.alive) return;
 
+    const isGiant = !!(c.giant || c.ipo);
+
+    // ── Giant 기업 자본 조달 — 현금 바닥 시 채권·주식 발행으로 즉시 보충 ──
+    // 실제 대형 기업(Google·MS·Apple 등)은 신용등급 AAA~AA 수준으로
+    // 어느 때나 채권·유상증자로 수십억 달러를 조달 가능. 파산 불가.
+    if (isGiant && c.revenue > 0) {
+      const giantFloor = c.revenue * 4; // 연매출 1배 수준 현금 최소 유지
+      if (c.cash < giantFloor) {
+        const raise = giantFloor - c.cash;
+        c.cash += raise;
+        // 조달 사실을 최초 1회만 뉴스에 표시
+        if (!c._raisedNews) {
+          c._raisedNews = true;
+          pushNews(`🏦 ${c.name}: 시장 조달(채권·주식) ${fmt(raise)} — 경쟁력 유지`, 'info');
+        }
+      } else {
+        c._raisedNews = false; // 현금 회복 시 다음 위기 때 다시 알림
+      }
+    }
+
     // ── 1. Budget: cash-aware, keeps 2-quarter salary buffer ──
     const salaryBuffer = getSalary(G.year) * c.employees * 0.5; // half-year buffer
     // Scale efficiency: larger companies get more leverage per dollar, so discretionary
@@ -2599,7 +2619,11 @@ function processCompetitors() {
     const investable   = Math.max(0, c.cash - salaryBuffer) * 0.25 + c.revenue * revenueInvestRate;
 
     // Competitive response: threatened companies boost spending
-    const threatBoost  = (playerGrew && c.marketShare > 0.0005) ? 1 + Math.random() * 0.35 : 1.0;
+    // Giant 기업은 플레이어가 성장할 때 훨씬 강하게 반격 (실제 빅테크의 자원력 반영)
+    const threatBoost  = (playerGrew && c.marketShare > 0.0005)
+      ? isGiant ? 1 + 0.40 + Math.random() * 0.40  // giant: +40~80% 반격
+               : 1 + Math.random() * 0.35           // 일반:  +0~35%
+      : 1.0;
 
     // Era disruption: tech-lagging companies panic-invest in R&D
     const techRequired = eraIdx * 22;
@@ -2722,8 +2746,16 @@ function processCompetitors() {
       c.cash -= c.revenue * lag * 0.15;
     }
 
+    // ── Giant 기업 시장점유율 최저선 ──
+    // 실제 Google·MS·Apple은 아무리 경쟁이 치열해도 완전히 시장에서 사라지지 않음.
+    // 기존 고객·플랫폼 잠금·브랜드 관성 등으로 최소 점유율 유지.
+    if (isGiant && c.marketShare < 0.002) {
+      c.marketShare = 0.002; // 전체 시장의 0.2% 최저선
+    }
+
     // ── 8b. eraLimit 초과: 역사적 운명 — 시대를 못 따라간 회사 ──
     // Lotus는 PC시대(era0)까지, Borland도 PC시대까지, Oracle은 인터넷(era1)까지
+    // Giant 기업은 eraLimit:4 이므로 이 패널티 대상 아님
     if (c.eraLimit !== undefined && eraIdx > c.eraLimit) {
       const eraBehind = eraIdx - c.eraLimit; // 몇 시대나 뒤처졌나
       const fateFactor = Math.min(0.30, eraBehind * 0.08); // 최대 30%/분기 패널티
@@ -2760,8 +2792,8 @@ function processCompetitors() {
 
     // ── 9. Bankruptcy ──
     // Realistic condition: cash < 0 AND this quarter's profit is also negative.
-    // A company with negative accumulated cash but positive profit is recovering → no penalty.
-    if (c.cash < 0 && c.profit < 0) {
+    // Giant 기업(Google·MS·Apple 등)은 파산 불가 — 위의 자본 조달 로직이 항상 먼저 개입.
+    if (c.cash < 0 && c.profit < 0 && !isGiant) {
       c.consecLoss = (c.consecLoss || 0) + 1;
 
       // Emergency bridge funding: industry/VC rescue round (hard → 낮음, easy → 높음)
@@ -2786,7 +2818,7 @@ function processCompetitors() {
       if (c.consecLoss >= threshold) {
         c.alive = false; c._justDied = true; c.marketShare = 0;
       }
-    } else {
+    } else if (!isGiant) {
       c.consecLoss = 0; // cash positive OR profit positive → recovering, reset counter
     }
 
