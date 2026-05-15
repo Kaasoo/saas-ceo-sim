@@ -710,7 +710,7 @@ const EVENTS_EN = {
   },
   '멕시코 페소 위기 — 신흥시장 충격': {
     title: 'Mexican Peso Crisis — Emerging Market Shock',
-    desc: 'The Mexican peso collapsed 50%, shaking all emerging markets. Latin America's IT market is contracting rapidly.',
+    desc: "The Mexican peso collapsed 50%, shaking all emerging markets. Latin America's IT market is contracting rapidly.",
     choices: [
       '🌍 Focus on developed markets: North America & Europe',
       '💡 Maintain emerging market presence with low-cost offering',
@@ -877,7 +877,7 @@ const EVENTS_EN = {
   },
   '빅데이터 시대': {
     title: 'Big Data Era',
-    desc: 'Demand for data analytics & BI software is exploding. Data-driven decision-making has become every company's top priority.',
+    desc: "Demand for data analytics & BI software is exploding. Data-driven decision-making has become every company's top priority.",
     choices: [
       '📊 Add large-scale data analytics & BI features',
       '🔗 Provide third-party analytics tool API integration',
