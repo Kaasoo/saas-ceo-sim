@@ -405,3 +405,406 @@ const HEADLINES = {
   ],
 
 };
+
+// ═══════════════════════════════════════════════════════════════════
+// English Headlines (parallel to HEADLINES, keyed by same years)
+// ═══════════════════════════════════════════════════════════════════
+const HEADLINES_EN = {
+
+  // ─── 1980s: PC Revolution ────────────────────────────────────────
+  1980: [
+    '📰 IBM releases the first Personal Computer — a $1,565 revolution',
+    '📰 Microsoft signs DOS supply deal with IBM — Bill Gates\'s historic gamble',
+    '📰 US inflation hits 13.5% — software market feeling the turbulence',
+    '📰 Apple begins the Lisa project — first commercial GUI development starts',
+    '📰 Atari dominates home gaming — new frontier for the software industry',
+  ],
+
+  1981: [
+    '📰 IBM PC sells 50,000 units in 4 months — Personal Computer era dawns',
+    '📰 MS-DOS 1.0 officially released — foundation of the PC software ecosystem',
+    '📰 Xerox PARC unveils mouse, GUI & Ethernet — Silicon Valley shocked',
+    '📰 US Fed pushes interest rate past 20% — IT startup funding in crisis',
+    '📰 Hayes modem standard established — dawn of the PC communications era',
+  ],
+
+  1982: [
+    '📰 Compaq launches IBM PC-compatible clone — PC market competition heats up',
+    '📰 AutoCAD released — software begins transforming the design industry',
+    '📰 Time magazine names the Personal Computer "Person of the Year"',
+    '📰 Intel announces 286 processor — software performance ceiling pushed again',
+    '📰 Lotus 1-2-3 development begins — spreadsheet software revolution incoming',
+  ],
+
+  1983: [
+    '📰 Apple Lisa ships — GUI-based computer goes on sale at $9,995',
+    '📰 Lotus 1-2-3 instant bestseller — business software market opens up',
+    '📰 Microsoft Word 1.0 released — the word processor wars begin',
+    '📰 Nintendo Famicom launches in Japan — video game industry revives',
+    '📰 ARPANET adopts TCP/IP — modern internet\'s foundation complete',
+  ],
+
+  1984: [
+    '📰 Apple Macintosh launches — "1984" ad rewrites computer history',
+    '📰 AT&T breakup — telecom deregulation slashes IT infrastructure costs',
+    '📰 Michael Dell founds Dell Computer in a dorm room — direct-sales model born',
+    '📰 Gibson\'s "Neuromancer" published — cyberspace concept goes mainstream',
+    '📰 Borland releases Turbo Pascal for $49.95 — low-cost dev tools revolution',
+  ],
+
+  1985: [
+    '📰 Microsoft Windows 1.0 released — Bill Gates\'s GUI challenge begins',
+    '📰 Aldus PageMaker launches — desktop publishing industry is born',
+    '📰 Steve Jobs ousted from Apple board — a defining moment in Silicon Valley history',
+    '📰 Intel announces 386 processor — dawn of the 32-bit PC era',
+    '📰 Plaza Accord signed — weaker dollar reshapes IT export structure',
+    '📰 Commodore Amiga ships — pioneer of multimedia computing',
+  ],
+
+  1986: [
+    '📰 Microsoft lists on NASDAQ — Bill Gates becomes a billionaire overnight',
+    '📰 Compaq ships 386-based PC — clone maker leaps ahead of IBM',
+    '📰 Pixar spins off from Lucasfilm — computer graphics studio is born',
+    '📰 Thinking Machines ships Connection Machine — parallel computing era previewed',
+    '📰 Chernobyl disaster — cracks in Soviet system, impact on Cold War tech race',
+  ],
+
+  1987: [
+    '📰 HyperCard released — link-based information prototype, forerunner of the web',
+    '📰 Black Monday (Oct 19) — Dow plunges 22%, IT investment sentiment craters',
+    '📰 GIF image format emerges — foreshadows the age of internet image sharing',
+    '📰 Motorola 68030 ships — Mac and workstation performance leaps forward',
+    '📰 Novell NetWare dominates enterprise LAN market — office networking standardized',
+  ],
+
+  1988: [
+    '📰 NeXT Computer launched — Jobs returns, pioneer of object-oriented OS',
+    '📰 Morris Worm spreads — first internet worm ushers in the security era',
+    '📰 Adobe Photoshop development begins — digital image editing revolution in the making',
+    '📰 NEC vs IBM patent battle intensifies — IP wars rock the PC market',
+    '📰 Intel 80486 development complete — the era of 10 million transistors',
+  ],
+
+  1989: [
+    '📰 Tim Berners-Lee submits World Wide Web proposal — seeds of the internet revolution',
+    '📰 Berlin Wall falls — Eastern Europe opens, new IT market opportunities emerge',
+    '📰 Intel 80486 ships — 486 PC era, software complexity reaches new heights',
+    '📰 Game Boy launches — Nintendo begins monopolizing handheld gaming',
+    '📰 Adobe Photoshop 1.0 released — creative software revolution begins',
+    '📰 Lotus Notes ships — groupware and enterprise collaboration software market born',
+  ],
+
+  // ─── 1990s: Web Revolution ───────────────────────────────────────
+  1990: [
+    '📰 Microsoft Windows 3.0 released — PC mass adoption crosses the tipping point',
+    '📰 World Wide Web released as open software — democratization of the internet begins',
+    '📰 Gulf War crisis — oil price spike, global IT supply chain rattled',
+    '📰 ARPANET officially decommissioned — civilian internet era fully underway',
+    '📰 Wolfram Research releases Mathematica — scientific software revolution',
+  ],
+
+  1991: [
+    '📰 Linux 0.0.1 released — Linus Torvalds\'s historic first commit',
+    '📰 First website goes live — the internet gets a new face',
+    '📰 Soviet Union collapses — Cold War ends, global IT market reshapes',
+    '📰 Apple PowerBook launches — the blueprint for the modern laptop',
+    '📰 Visual Basic 1.0 released — the age of RAD (Rapid Application Development) begins',
+  ],
+
+  1992: [
+    '📰 Windows 3.1 ships — 1 million copies sold in one month',
+    '📰 CompuServe & America Online launch internet access services — online era begins',
+    '📰 IBM announces massive restructuring — even tech giants must innovate or die',
+    '📰 Sun Microsystems begins Java development (codename Oak) — platform independence dream',
+    '📰 Nokia ships first GSM mobile phone — dawn of the mobile era',
+  ],
+
+  1993: [
+    '📰 Mosaic browser released — graphical internet era begins',
+    '📰 Intel Pentium ships — 486 era ends, multimedia PCs go mainstream',
+    '📰 Microsoft Office dominates business software — bundling strategy wins',
+    '📰 Clinton administration unveils Information Superhighway vision',
+    '📰 Apple Newton PDA ships — early experiment in mobile computing',
+  ],
+
+  1994: [
+    '📰 Netscape Navigator released — browser wars begin',
+    '📰 Amazon.com founded — Jeff Bezos\'s online bookstore changes the world',
+    '📰 Yahoo! founded — directory-style web portal emerges',
+    '📰 Internet users surpass 25 million — explosive growth underway',
+    '📰 Pentium FDIV bug scandal — software quality trust becomes critical',
+    '📰 PlayStation launches in Japan — CD-ROM-based gaming era opens',
+  ],
+
+  1995: [
+    '📰 Windows 95 launches — "Start Me Up" heralds an OS paradigm shift',
+    '📰 Netscape IPO blockbuster — signals the start of the dot-com bubble',
+    '📰 Java 1.0 announced — "Write Once, Run Anywhere" era begins',
+    '📰 eBay founded — person-to-person online marketplace born',
+    '📰 DVD standard finalized — digital media distribution at an inflection point',
+    '📰 Amazon makes first book sale — e-commerce year zero',
+  ],
+
+  1996: [
+    '📰 Microsoft Internet Explorer vs Netscape — browser war goes full throttle',
+    '📰 Google founders begin BackRub search engine research at Stanford',
+    '📰 Palm Pilot ships — the true pocket computer era arrives',
+    '📰 Nintendo 64 launches — golden age of 3D gaming begins',
+    '📰 Tokyo telecom deregulation — Asian IT market rapid growth signals',
+  ],
+
+  1997: [
+    '📰 Steve Jobs returns as Apple CEO — legend reborn from worst-ever crisis',
+    '📰 Deep Blue defeats chess champion Kasparov — AI history milestone',
+    '📰 Asian financial crisis — IT restructuring wave hits Korea, Thailand and beyond',
+    '📰 Amazon expands beyond books into music & DVDs — e-commerce explodes',
+    '📰 HDTV broadcast standard finalized — digital broadcasting era begins',
+  ],
+
+  1998: [
+    '📰 Google founded — Page & Brin\'s search engine shakes Silicon Valley',
+    '📰 iMac G3 ships — Jony Ive\'s design revolution signals Apple\'s comeback',
+    '📰 Windows 98 released — internet-integrated OS complete',
+    '📰 Microsoft faces antitrust lawsuit — the dawn of big-tech regulation',
+    '📰 Internet users surpass 100 million — dot-com boom heading for peak',
+    '📰 Korean government announces broadband infrastructure investment — IT powerhouse foundation',
+  ],
+
+  1999: [
+    '📰 Napster launched — P2P file sharing declares war on the music industry',
+    '📰 Internet IPO frenzy — money-losing companies valued at billions',
+    '📰 Y2K bug panic — global IT infrastructure emergency checks',
+    '📰 Wi-Fi (802.11b) standard established — wireless internet foundation laid',
+    '📰 BlackBerry ships first smartphone — mobile email era opens',
+    '📰 Linux kernel 2.2 released — open source enters the enterprise server market',
+  ],
+
+  // ─── 2000s: Dot-com Bust → Web 2.0 ──────────────────────────────
+  2000: [
+    '📰 Dot-com bubble bursts — NASDAQ drops 78%, IT startups fail en masse',
+    '📰 Y2K fears proved baseless — billions in software investment safe',
+    '📰 Windows 2000 released — new standard for enterprise OS',
+    '📰 USB 2.0 standard finalized — peripheral connectivity revolutionized',
+    '📰 PlayStation 2 ships — Sony scores big with DVD-capable gaming console',
+  ],
+
+  2001: [
+    '📰 Wikipedia launched — collective intelligence builds the world\'s largest encyclopedia',
+    '📰 Apple releases iTunes — digital music distribution revolution begins',
+    '📰 9/11 attacks — US recession, IT investment collapses',
+    '📰 Windows XP released — consumer and enterprise Windows unified',
+    '📰 First iPod ships — "1,000 songs in your pocket," Steve Jobs declares',
+    '📰 Dot-com fallout — only survivors like Amazon & eBay remain after restructuring',
+  ],
+
+  2002: [
+    '📰 Google AdWords revenue model matures — golden age of search advertising begins',
+    '📰 PayPal acquired by eBay for $1.5B — online payment infrastructure consolidated',
+    '📰 Friendster founded — the original social network',
+    '📰 Sarbanes-Oxley Act passed — accounting transparency requirements spike ERP demand',
+    '📰 BlackBerry 6710 ships — QWERTY smartphone dominates enterprise market',
+  ],
+
+  2003: [
+    '📰 iTunes Store opens — legal digital music at $0.99 per track',
+    '📰 MySpace founded — pioneer of the social media boom',
+    '📰 LinkedIn founded — business social network market born',
+    '📰 Iraq War begins — cybersecurity and military IT budgets surge',
+    '📰 Skype founded — VoIP collapses international calling rates',
+    '📰 Open-source MySQL challenges enterprise DB market — LAMP stack peaks',
+  ],
+
+  2004: [
+    '📰 Google IPO — $85 per share, day-one market cap surpasses $23B',
+    '📰 Facebook founded — Mark Zuckerberg\'s Harvard dorm project',
+    '📰 Mozilla Firefox 1.0 released — cracks appear in IE\'s browser monopoly',
+    '📰 Web 2.0 Conference — user-participatory internet paradigm declared',
+    '📰 Flickr launches — photo-sharing platform era begins',
+    '📰 Gmail beta — 1 GB free email reinvents web mail',
+  ],
+
+  2005: [
+    '📰 YouTube founded — "Broadcast Yourself", video sharing revolution',
+    '📰 Google acquires Android — mobile OS war foreshadowed',
+    '📰 Ajax technology rises — Google Maps revolutionizes web app interactivity',
+    '📰 Podcasting boom — audio content democratized',
+    '📰 Digg grows — social news aggregation platform in its prime',
+    '📰 Sun considers open-sourcing Java — open source tide is unstoppable',
+  ],
+
+  2006: [
+    '📰 Twitter founded — 140-character revolution, real-time social media era',
+    '📰 Amazon Web Services (AWS) launches — cloud computing era begins',
+    '📰 Google acquires YouTube for $1.65B',
+    '📰 Nintendo Wii ships — motion controls bring gaming to the masses',
+    '📰 Rumors of first iPhone — industry on edge',
+    '📰 Facebook expands beyond college campuses — 20M users surpassed',
+  ],
+
+  2007: [
+    '📰 Apple iPhone launches — rewrites smartphone history',
+    '📰 Kindle ships — new paradigm for the e-book market',
+    '📰 Subprime mortgage crisis — prelude to financial meltdown',
+    '📰 Android OS announced — Google declares mobile ecosystem ambitions',
+    '📰 Dropbox founded — cloud storage goes mainstream',
+    '📰 Facebook Platform opens — social app ecosystem born',
+  ],
+
+  2008: [
+    '📰 Global financial crisis — Lehman Brothers collapses, IT investment contracts fast',
+    '📰 App Store launches — the mobile app economy is born',
+    '📰 HTC Dream ships first Android device — iOS vs Android duopoly forms',
+    '📰 Spotify launches in Europe — music streaming subscription model emerges',
+    '📰 GitHub founded — center of the open source collaboration universe',
+    '📰 SaaS model surges — subscription software accelerates amid economic downturn',
+  ],
+
+  2009: [
+    '📰 Bitcoin created — Satoshi Nakamoto\'s blockchain white paper becomes reality',
+    '📰 WhatsApp founded — mobile messaging revolution begins',
+    '📰 Foursquare emerges — location-based social service boom',
+    '📰 Google Chrome OS announced — browser-centric computing vision',
+    '📰 Glitch development begins (Slack precursor) — team collaboration tool revolution seeds planted',
+    '📰 Cloud companies grow through recession — SaaS proves its resilience',
+  ],
+
+  // ─── 2010s: Mobile, Cloud & Big Data ─────────────────────────────
+  2010: [
+    '📰 iPad launches — tablet market redefined',
+    '📰 Instagram founded — one photo filter, one billion users',
+    '📰 Salesforce dominates cloud CRM — B2B SaaS growth proven',
+    '📰 Pinterest founded — visual social bookmarking born',
+    '📰 Korea first to commercialize 4G LTE — mobile internet speed revolution',
+  ],
+
+  2011: [
+    '📰 Steve Jobs passes away — Silicon Valley and tech industry mourn deeply',
+    '📰 Siri launches — AI voice assistant goes mainstream',
+    '📰 LinkedIn IPO success — business SNS value proven',
+    '📰 Watson defeats Jeopardy! champions — AI makes a real-world leap',
+    '📰 Cloud infrastructure spending surpasses $100B — IT consumption fully transformed',
+    '📰 Twilio prepares for IPO — rise of the API economy',
+  ],
+
+  2012: [
+    '📰 Facebook IPO — $104B market cap, largest tech IPO at the time',
+    '📰 Microsoft Azure expands enterprise services — cloud three-way race forms',
+    '📰 Instagram acquired by Facebook for $1B',
+    '📰 Dropbox surpasses 100M users — personal cloud era',
+    '📰 Big Data rises — Hadoop ecosystem and analytics demand explode',
+  ],
+
+  2013: [
+    '📰 Edward Snowden exposes NSA surveillance — privacy and encryption demand spikes',
+    '📰 Docker released — container technology sparks DevOps revolution',
+    '📰 Snapchat surges — younger generation migrates on social media',
+    '📰 ARR metric entrenched as SaaS valuation standard — subscription economy mainstream',
+    '📰 Tesla pioneers EV market — software-defined car era foreshadowed',
+  ],
+
+  2014: [
+    '📰 Slack officially launches — revolution in enterprise internal communication',
+    '📰 Microsoft declares Mobile First, Cloud First strategy — Satya Nadella takes helm',
+    '📰 WhatsApp acquired by Facebook for $19B — largest M&A ever at the time',
+    '📰 Twitch acquired by Amazon for $970M — live streaming wars begin',
+    '📰 Open-source ML libraries proliferate — AI democratization accelerates',
+  ],
+
+  2015: [
+    '📰 GitHub valued at $2B — developer platform golden age',
+    '📰 Google restructures under Alphabet holding company',
+    '📰 OpenAI founded — non-profit AI safety research organization born',
+    '📰 Zendesk, HubSpot and other SaaS firms go public — B2B SaaS investment frenzy',
+    '📰 Swift open-sourced — Apple developer ecosystem expands',
+    '📰 Global smartphone users surpass 2.5 billion',
+  ],
+
+  2016: [
+    '📰 AlphaGo vs Lee Se-dol — AI defeats world Go champion',
+    '📰 Slack valued at $3.7B — new king of the collaboration tools market',
+    '📰 Microsoft acquires LinkedIn for $26.2B — enterprise SNS locked down',
+    '📰 Uber disrupts traditional transport with ride-sharing — platform business model peaks',
+    '📰 Deep learning image and speech recognition surpasses human accuracy',
+  ],
+
+  2017: [
+    '📰 AWS, Azure & GCP consolidate as the big three — cloud market tops $200B annually',
+    '📰 iPhone X ships — Face ID and OLED redefine smartphone design',
+    '📰 Bitcoin surpasses $20,000 — crypto mania',
+    '📰 GDPR preparations — EU privacy regulations spike SaaS compliance costs',
+    '📰 GitHub grows to 27 million developers',
+  ],
+
+  2018: [
+    '📰 GitHub acquired by Microsoft for $7.5B — developer ecosystem mega-merger',
+    '📰 GDPR takes effect — EU data protection forces SaaS compliance spending surge',
+    '📰 Zoom Video Communications surges in the enterprise market',
+    '📰 Slack, Dropbox and other SaaS unicorns prepare IPOs — investment market overheats',
+    '📰 Open-source license debate — MongoDB, Redis switch to server-side public licenses',
+  ],
+
+  2019: [
+    '📰 Zoom, Slack, Cloudflare IPOs in quick succession — SaaS market at its peak',
+    '📰 WeWork IPO collapses — bubble warning, startup valuations reassessed',
+    '📰 5G commercial services launch — Korea, US and others enter next-gen telecom era',
+    '📰 Microsoft annual revenue tops $100B — cloud-powered comeback complete',
+    '📰 Google claims quantum supremacy — quantum computing era previewed',
+    '📰 US-China trade war — tech supply chain reshuffled, semiconductor & software localization accelerates',
+  ],
+
+  // ─── 2020s: AI Revolution ────────────────────────────────────────
+  2020: [
+    '📰 COVID-19 pandemic — remote work explodes, Zoom / Slack / SaaS companies boom',
+    '📰 Cloud infrastructure demand surges 300% as the world goes remote',
+    '📰 GPT-3 announced — large language models open a new frontier for AI',
+    '📰 Snowflake IPO — breaks record as largest-ever software IPO',
+    '📰 M1 chip unveiled — Apple Silicon shifts the computing performance paradigm',
+    '📰 Gaming & streaming see greatest growth ever — contactless entertainment era',
+  ],
+
+  2021: [
+    '📰 Coinbase IPO — crypto exchange lists on NASDAQ, coins go mainstream',
+    '📰 NFT craze — digital asset ownership revolution, or speculation?',
+    '📰 Global semiconductor shortage — auto and electronics production disrupted',
+    '📰 Microsoft Teams hits 270 million users — collaboration tool market reshuffled',
+    '📰 Log4Shell vulnerability — lessons from the open-source security crisis',
+    '📰 Metaverse mania — Facebook Horizon, future of virtual workspaces?',
+  ],
+
+  2022: [
+    '📰 ChatGPT launches — AI chatbot hits 100M users at fastest pace in IT history',
+    '📰 Global rate-hike cycle — tech company valuations drop 50%',
+    '📰 Twitter acquired by Elon Musk for $44B — social media upheaval',
+    '📰 AWS, Azure & GCP face profitability pressure — cloud cost optimization demand spikes',
+    '📰 GitHub Copilot — AI code generation tool revolutionizes developer productivity',
+    '📰 SaaS stocks fall 70% on average — the end of growth without profits',
+  ],
+
+  2023: [
+    '📰 ChatGPT & GPT-4 launch — generative AI boom, every software company races to integrate AI',
+    '📰 Microsoft invests $10B in OpenAI — AI supremacy war goes full throttle',
+    '📰 Google Bard, Meta LLaMA intensify LLM competition',
+    '📰 SVB (Silicon Valley Bank) collapses — startup financial ecosystem shocked',
+    '📰 Generative AI copyright lawsuits flood courts — AI training data legal status unclear',
+    '📰 Figma-Adobe acquisition blocked — big-tech M&A regulation tightens',
+  ],
+
+  2024: [
+    '📰 AI agent era begins — GPT-4o, Claude 3 & Gemini compete head-to-head',
+    '📰 NVIDIA market cap tops $3 trillion — AI infrastructure demand fuels semiconductor golden age',
+    '📰 Apple Intelligence announced — on-device AI era arrives',
+    '📰 Open-source LLMs (Llama 3, Mistral, etc.) surge — AI democratization accelerates',
+    '📰 Regulators intensify scrutiny of AI & big-tech monopolies — global AI regulation frameworks race ahead',
+    '📰 AI coding assistant adoption soars — software development productivity revolution',
+  ],
+
+  2025: [
+    '📰 AI agents go commercial — autonomous software agents automate enterprise workflows',
+    '📰 First quantum computing commercial case emerges — encryption paradigm shift imminent',
+    '📰 SaaS + AI convergence — "Intelligent SaaS" market surges',
+    '📰 Global semiconductor supply chain reshuffles — US, Europe, Korea & Japan race for domestic production',
+    '📰 Global AI regulation standards debated — EU AI Act in force, enterprise compliance costs rise',
+    '📰 Edge AI proliferates — AI inference moves on-device, reducing cloud dependency',
+  ],
+
+};
