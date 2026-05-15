@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CEO 시뮬레이터 — 소프트웨어 제국 1980–2050</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20260515a">
 <script src="chart.umd.min.js"></script>
 </head>
 <body>
@@ -112,7 +112,7 @@
     </div>
     <div class="mb-tabs">
       <button class="mb-tab active" id="mb-tab-decision" onclick="switchMobilePanel('decision')">📋 의사결정</button>
-      <button class="mb-tab" id="mb-tab-dashboard" onclick="switchMobilePanel('dashboard')">📊 대시보드</button>
+      <button class="mb-tab" id="mb-tab-dashboard" onclick="switchMobilePanel('dashboard')">📊 보고서</button>
     </div>
   </div>
 
@@ -304,54 +304,64 @@
 
       <!-- TABS -->
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('dashboard',this)">📊 대시보드</button>
+        <button class="tab active" onclick="switchTab('dashboard',this)">📋 재무제표</button>
         <button class="tab" onclick="switchTab('market',this)">🏆 시장 현황</button>
         <button class="tab" onclick="switchTab('history',this)">📈 성과 추이</button>
         <button class="tab" onclick="switchTab('theory',this)">📚 경영 이론</button>
       </div>
 
-      <!-- TAB: DASHBOARD -->
+      <!-- TAB: DASHBOARD (재무제표) -->
       <div id="tab-dashboard" class="tab-panel active">
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">연간 환산 매출</div>
-            <div class="kpi-val" id="k-arr">$0</div>
-            <div class="kpi-delta" id="k-arr-d">—</div>
+
+        <!-- ── 간략 재무제표 ── -->
+        <div class="fs-wrap">
+          <div class="fs-section">
+            <div class="fs-section-title">📄 손익계산서 (분기)</div>
+            <div class="fs-row"><span class="fs-label">매출액</span><span class="fs-val" id="fs-rev">—</span><span class="fs-delta" id="fs-rev-d"></span></div>
+            <div class="fs-row fs-sub"><span class="fs-label">(-) 매출원가</span><span class="fs-val" id="fs-cogs">—</span></div>
+            <div class="fs-row fs-border"><span class="fs-label fs-bold">매출총이익</span><span class="fs-val fs-bold" id="fs-gross">—</span></div>
+            <div class="fs-row fs-sub"><span class="fs-label">(-) R&D 비용</span><span class="fs-val" id="fs-rd">—</span></div>
+            <div class="fs-row fs-sub"><span class="fs-label">(-) 마케팅 비용</span><span class="fs-val" id="fs-mkt">—</span></div>
+            <div class="fs-row fs-sub"><span class="fs-label">(-) 인건비</span><span class="fs-val" id="fs-hr">—</span></div>
+            <div class="fs-row fs-border"><span class="fs-label fs-bold">영업이익</span><span class="fs-val fs-bold" id="fs-opinc">—</span></div>
+            <div class="fs-row fs-sub"><span class="fs-label">(-) 이자비용</span><span class="fs-val" id="fs-interest">—</span></div>
+            <div class="fs-row fs-total"><span class="fs-label fs-bold">당기순이익</span><span class="fs-val fs-bold" id="fs-net">—</span><span class="fs-delta" id="fs-net-d"></span></div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-label">분기 순이익</div>
-            <div class="kpi-val" id="k-profit">$0</div>
-            <div class="kpi-delta" id="k-profit-d">—</div>
+
+          <div class="fs-section">
+            <div class="fs-section-title">🏦 재무상태 (현재)</div>
+            <div class="fs-row"><span class="fs-label">현금 및 현금성자산</span><span class="fs-val" id="fs-cash">—</span></div>
+            <div class="fs-row"><span class="fs-label">연간 환산 매출 (ARR)</span><span class="fs-val" id="fs-arr">—</span><span class="fs-delta" id="fs-arr-d"></span></div>
+            <div class="fs-row"><span class="fs-label">차입금 (대출)</span><span class="fs-val" id="fs-loan" style="color:var(--red)">—</span></div>
+            <div class="fs-row fs-border"><span class="fs-label fs-bold">순현금 (현금-대출)</span><span class="fs-val fs-bold" id="fs-netcash">—</span></div>
+            <div class="fs-row"><span class="fs-label">시장점유율</span><span class="fs-val" id="k-share">—</span><span class="fs-delta" id="k-share-d"></span></div>
+            <div class="fs-row"><span class="fs-label">임직원 수</span><span class="fs-val" id="fs-emp">—</span></div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-label">시장점유율</div>
-            <div class="kpi-val" id="k-share">0.00%</div>
-            <div class="kpi-delta" id="k-share-d">—</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">제품 품질</div>
-            <div class="kpi-val" id="k-quality">0</div>
-            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-q-bar"></div></div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">브랜드 파워</div>
-            <div class="kpi-val" id="k-brand">0</div>
-            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-b-bar"></div></div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">기술 수준</div>
-            <div class="kpi-val" id="k-tech">0</div>
-            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-t-bar"></div></div>
-          </div>
-          <div class="kpi-card" style="grid-column:span 2">
-            <div class="kpi-label">직원 사기 · 이탈률</div>
-            <div class="kpi-val" id="k-morale" style="font-size:13px">—</div>
-            <div class="kpi-bar-wrap"><div class="kpi-bar" id="k-morale-bar"></div></div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">분기 이탈</div>
-            <div class="kpi-val" id="k-attrition" style="font-size:14px">0명</div>
-            <div class="kpi-label" id="k-min-emp" style="margin-top:4px">—</div>
+
+          <div class="fs-section">
+            <div class="fs-section-title">⚙️ 역량 지표</div>
+            <div class="fs-cap-row">
+              <span class="fs-label">제품 품질</span>
+              <span class="fs-val" id="k-quality">0</span>
+              <div class="kpi-bar-wrap" style="flex:1"><div class="kpi-bar" id="k-q-bar"></div></div>
+            </div>
+            <div class="fs-cap-row">
+              <span class="fs-label">브랜드 파워</span>
+              <span class="fs-val" id="k-brand">0</span>
+              <div class="kpi-bar-wrap" style="flex:1"><div class="kpi-bar" id="k-b-bar"></div></div>
+            </div>
+            <div class="fs-cap-row">
+              <span class="fs-label">기술 수준</span>
+              <span class="fs-val" id="k-tech">0</span>
+              <div class="kpi-bar-wrap" style="flex:1"><div class="kpi-bar" id="k-t-bar"></div></div>
+            </div>
+            <div class="fs-cap-row">
+              <span class="fs-label">직원 사기</span>
+              <span class="fs-val" id="k-morale" style="font-size:12px">—</span>
+              <div class="kpi-bar-wrap" style="flex:1"><div class="kpi-bar" id="k-morale-bar"></div></div>
+            </div>
+            <div class="fs-row" style="margin-top:6px"><span class="fs-label">분기 이탈</span><span class="fs-val" id="k-attrition">0명</span></div>
+            <div class="fs-row"><span class="fs-label" id="k-min-emp" style="color:var(--muted);font-size:11px">—</span></div>
           </div>
         </div>
 
@@ -602,7 +612,7 @@
   </div>
 </div>
 
-<script src="js/headlines.js?v=20250510b"></script>
-<script src="js/game.js?v=20250510b"></script>
+<script src="js/headlines.js?v=20260515a"></script>
+<script src="js/game.js?v=20260515a"></script>
 </body>
 </html>

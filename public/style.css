@@ -446,10 +446,26 @@ button{cursor:pointer;font-family:inherit}
 .kpi-label{font-size:9px;color:var(--muted);letter-spacing:.5px;margin-bottom:4px}
 .kpi-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
 .kpi-delta{font-size:10px;color:var(--muted);margin-top:4px}
-.kpi-delta.pos{color:var(--green)}
-.kpi-delta.neg{color:var(--red)}
+.kpi-delta.pos,.fs-delta.pos{color:var(--green)}
+.kpi-delta.neg,.fs-delta.neg{color:var(--red)}
 .kpi-bar-wrap{height:4px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden}
 .kpi-bar{height:100%;background:var(--blue);border-radius:2px;transition:width .5s}
+
+/* FINANCIAL STATEMENT */
+.fs-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.fs-section{background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:12px}
+.fs-section-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:10px;text-transform:uppercase}
+.fs-row{display:flex;align-items:baseline;gap:6px;padding:3px 0;font-size:12px}
+.fs-row.fs-sub .fs-label{padding-left:12px;color:var(--muted)}
+.fs-row.fs-border{border-top:1px solid var(--line);margin-top:4px;padding-top:6px}
+.fs-row.fs-total{border-top:2px solid var(--line);margin-top:4px;padding-top:6px}
+.fs-label{flex:1;color:var(--text);white-space:nowrap}
+.fs-val{font-weight:600;font-variant-numeric:tabular-nums;font-size:13px;text-align:right;min-width:80px}
+.fs-bold{font-weight:700;font-size:14px}
+.fs-delta{font-size:10px;color:var(--muted);min-width:44px;text-align:right}
+.fs-cap-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
+.fs-cap-row .fs-label{flex:none;width:72px}
+.fs-cap-row .fs-val{font-size:12px;min-width:36px;text-align:right}
 
 /* CHART CARD */
 .chart-card{

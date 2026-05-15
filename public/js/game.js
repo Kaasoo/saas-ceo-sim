@@ -2318,7 +2318,11 @@ function processTurn() {
     compRevenues: G.competitors.map(c => c.revenue  || 0),
     compProfits:  G.competitors.map(c => c.profit   || 0),
     // 이번 분기에 사용된 의사결정 값 (다음 분기 QoQ 비교용)
-    _dsRD: decisionState.rd, _dsMkt: decisionState.mkt,
+    _dsRD: decisionState.rd, _dsMkt: decisionState.mkt, _dsHR: decisionState.hr,
+    // 재무제표용 비용 내역
+    _cogs: costs.cogs, _rd: costs.rd, _mkt: costs.mkt,
+    _hr: costs.hr + costs.sal, _interest: costs.loan,
+    _loan: (G.loans || []).reduce((s, l) => s + l.balance, 0),
   });
 
   // 11. Check game conditions
@@ -3118,11 +3122,53 @@ function renderDashboard() {
   const h = G.history[G.history.length-1];
   const prev = G.history.length > 1 ? G.history[G.history.length-2] : null;
 
-  const annualRev = h.rev * 4;
-  const prevAR    = prev ? prev.rev * 4 : null;
-  setKPI('k-arr',    fmt(annualRev), prevAR ? delta(annualRev, prevAR) : null);
-  setKPI('k-profit', fmt(h.profit),  prev   ? delta(h.profit, prev.profit) : null);
-  // 경쟁사 간 상대 점유율 (합계 100%) 로 표시
+  // ── 재무제표 헬퍼 ──
+  const setFS = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setFSColor = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.color = val < 0 ? 'var(--red)' : val > 0 ? 'var(--green)' : '';
+  };
+  const setFSDelta = (id, curr, prev2) => {
+    const el = document.getElementById(id);
+    if (!el || prev2 == null) return;
+    const d = delta(curr, prev2);
+    if (d) { el.textContent = d.str; el.className = 'fs-delta ' + d.cls; }
+  };
+
+  // ── 손익계산서 ──
+  const cogs     = h._cogs     ?? Math.round(h.rev * 0.22);
+  const rdCost   = h._rd       ?? 0;
+  const mktCost  = h._mkt      ?? 0;
+  const hrCost   = h._hr       ?? 0;
+  const interest = h._interest ?? 0;
+  const gross    = h.rev - cogs;
+  const opInc    = gross - rdCost - mktCost - hrCost;
+
+  setFS('fs-rev',      fmt(h.rev));       setFSDelta('fs-rev-d',  h.rev,    prev?.rev);
+  setFS('fs-cogs',     fmt(cogs));
+  setFS('fs-gross',    fmt(gross));       setFSColor('fs-gross',  gross);
+  setFS('fs-rd',       fmt(rdCost));
+  setFS('fs-mkt',      fmt(mktCost));
+  setFS('fs-hr',       fmt(hrCost));
+  setFS('fs-opinc',    fmt(opInc));       setFSColor('fs-opinc',  opInc);
+  setFS('fs-interest', interest > 0 ? fmt(interest) : '—');
+  setFS('fs-net',      fmt(h.profit));    setFSColor('fs-net',    h.profit);
+                                          setFSDelta('fs-net-d',  h.profit, prev?.profit);
+
+  // ── 재무상태 ──
+  const annualRev  = h.rev * 4;
+  const prevAR     = prev ? prev.rev * 4 : null;
+  const loanBal    = h._loan ?? (G.loans || []).reduce((s, l) => s + l.balance, 0);
+  const netCash    = h.cash - loanBal;
+
+  setFS('fs-cash',    fmt(h.cash));
+  setFS('fs-arr',     fmt(annualRev));    setFSDelta('fs-arr-d',  annualRev, prevAR);
+  setFS('fs-loan',    loanBal > 0 ? fmt(loanBal) : '없음');
+  setFS('fs-netcash', fmt(netCash));      setFSColor('fs-netcash', netCash);
+  setFS('fs-emp',     G.employees + '명');
+
+  // 시장점유율
   const relShare = h.relShare ?? h.share;
   const prevRelShare = prev ? (prev.relShare ?? prev.share) : null;
   setKPI('k-share', (relShare * 100).toFixed(1) + '%',
@@ -3200,7 +3246,8 @@ function renderDashboard() {
 }
 
 function setKPI(id, val, deltaStr) {
-  document.getElementById(id).textContent = val;
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
   const dEl = document.getElementById(id+'-d');
   if (dEl && deltaStr) {
     dEl.textContent  = deltaStr.str;
@@ -5372,13 +5419,15 @@ function preQuarterCheck() {
   // ① 예산 변동 — 전 분기 결산 대비
   const prevRD  = prev ? (prev._dsRD  ?? null) : null;
   const prevMkt = prev ? (prev._dsMkt ?? null) : null;
+  const prevHR  = prev ? (prev._dsHR  ?? null) : null;
   const rdDelta  = prevRD  !== null ? Math.round((ds.rd  - prevRD)  / Math.max(1, prevRD)  * 100) : null;
   const mktDelta = prevMkt !== null ? Math.round((ds.mkt - prevMkt) / Math.max(1, prevMkt) * 100) : null;
+  const hrDelta  = prevHR  !== null ? Math.round((ds.hr  - prevHR)  / Math.max(1, prevHR)  * 100) : null;
 
   const budgetLines = [
     `R&D: <strong>${fmt(ds.rd)}</strong>${rdDelta !== null  ? ` <span style="color:${rdDelta  >= 0?'var(--green)':'var(--red)'}">(${rdDelta  >= 0?'+':''}${rdDelta}%)</span>`  : ''}`,
     `마케팅: <strong>${fmt(ds.mkt)}</strong>${mktDelta !== null ? ` <span style="color:${mktDelta >= 0?'var(--green)':'var(--red)'}">(${mktDelta >= 0?'+':''}${mktDelta}%)</span>` : ''}`,
-    `HR: <strong>${fmt(ds.hr)}</strong>`,
+    `HR: <strong>${fmt(ds.hr)}</strong>${hrDelta !== null  ? ` <span style="color:${hrDelta  >= 0?'var(--green)':'var(--red)'}">(${hrDelta  >= 0?'+':''}${hrDelta}%)</span>`  : ''}`,
   ];
   items.push({ icon: '💰', title: '예산 배분', body: budgetLines.join(' &nbsp;·&nbsp; '), warn: false });
 
