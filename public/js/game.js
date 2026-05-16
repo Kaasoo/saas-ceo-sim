@@ -5030,7 +5030,10 @@ function _briefFinance(h) {
   const _bfEn = typeof LANG !== 'undefined' && LANG.current === 'en';
   const loanHtml = loans.length > 0 ? loans.map(l => {
     const remaining = (l.qPay || 0) * (l.quartersLeft || 0);
-    const loanName  = l.name || l.type || (_bfEn ? 'Loan' : '대출');
+    const loanDef   = typeof FUNDING_OPTS !== 'undefined' && FUNDING_OPTS.find(o => o.id === l.type);
+    const loanName  = _bfEn
+      ? ((loanDef && loanDef.en && loanDef.en.label) || l.name || 'Loan')
+      : (l.name || '대출');
     return `<div class="brief-fund-row">
       <div class="brief-fund-label">
         <span>${loanName}</span>
