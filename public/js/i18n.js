@@ -83,6 +83,9 @@ function applyI18n() {
   // Dynamic game UI — only if game is running
   if (typeof renderAll === 'function' && typeof G !== 'undefined' && G.history && G.history.length) {
     renderAll();
+    // Re-sync slider hints (HR index line, price hint) — not covered by renderAll
+    if (typeof syncSlider === 'function') { syncSlider('rd'); syncSlider('mkt'); syncSlider('hr'); }
+    if (typeof syncPrice  === 'function') syncPrice();
   }
 }
 
