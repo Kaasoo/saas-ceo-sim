@@ -6397,4 +6397,9 @@ window.addEventListener('DOMContentLoaded', () => {
     refreshSaveSlots('save-slots', 'load');
     refreshContinueButton();
   }
+  // Show app version in bottom-left
+  const verEl = document.getElementById('app-version');
+  if (verEl && typeof APP_VERSION !== 'undefined') {
+    verEl.textContent = `v${APP_VERSION.name} (${APP_VERSION.code})`;
+  }
 });

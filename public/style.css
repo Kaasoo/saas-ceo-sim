@@ -1367,3 +1367,17 @@ button{cursor:pointer;font-family:inherit}
   letter-spacing: 1px;
 }
 .qrun-skip:hover { color: var(--text); }
+
+/* ── App version display (bottom-left, intro screen) ── */
+.app-version {
+  position: fixed;
+  bottom: 8px;
+  left: 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.22);
+  font-family: monospace;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  z-index: 10;
+  user-select: none;
+}
