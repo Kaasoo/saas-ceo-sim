@@ -6388,6 +6388,10 @@ window.addEventListener('DOMContentLoaded', () => {
   syncSlider('mkt');
   syncSlider('hr');
   syncPrice();
-  refreshSaveSlots('save-slots', 'load');
-  refreshContinueButton();
+  // Apply saved language preference on first load (data-i18n + dynamic intro elements)
+  if (typeof applyI18n === 'function') applyI18n();
+  else {
+    refreshSaveSlots('save-slots', 'load');
+    refreshContinueButton();
+  }
 });

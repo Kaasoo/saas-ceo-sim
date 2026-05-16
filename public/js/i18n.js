@@ -53,13 +53,17 @@ function setLang(lang) {
 
 /** Apply translations to all [data-i18n] elements and re-render game UI. */
 function applyI18n() {
-  // Static elements
+  // Static elements — textContent (or placeholder/title via data-i18n-attr)
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     const val = t(key);
     if (el.getAttribute('data-i18n-attr') === 'placeholder') el.placeholder = val;
     else if (el.getAttribute('data-i18n-attr') === 'title')  el.title = val;
     else el.textContent = val;
+  });
+  // Tooltip titles via data-i18n-tip (separate from textContent)
+  document.querySelectorAll('[data-i18n-tip]').forEach(el => {
+    el.title = t(el.getAttribute('data-i18n-tip'));
   });
   // HTML elements with data-i18n-html (for bold/spans inside)
   document.querySelectorAll('[data-i18n-html]').forEach(el => {
@@ -73,6 +77,9 @@ function applyI18n() {
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === LANG.current);
   });
+  // Re-render dynamic intro-screen elements (continue button, save slots)
+  if (typeof refreshContinueButton === 'function') refreshContinueButton();
+  if (typeof refreshSaveSlots === 'function') refreshSaveSlots('save-slots', 'load');
   // Dynamic game UI — only if game is running
   if (typeof renderAll === 'function' && typeof G !== 'undefined' && G.history && G.history.length) {
     renderAll();
